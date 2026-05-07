@@ -1,4 +1,5 @@
-package domain;
+package accommodation_supplier.domain;
+import domain.Accommodation;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -8,6 +9,7 @@ import java.util.*;
 public class AccommodationRepository {
     private static final Map<String, Accommodation> accommodations = new HashMap<>();
 
+    @PostConstruct
     public void initData() {
         Accommodation a1 = new Accommodation();
         a1.setId(1);
@@ -33,5 +35,7 @@ public class AccommodationRepository {
         a3.setAmountOfAvailableRooms(3);
         accommodations.put(String.valueOf(a3.getId()), a3);
     }
+
+    public Collection<Accommodation> getAllAccommodations() {return accommodations.values();}
 }
 
