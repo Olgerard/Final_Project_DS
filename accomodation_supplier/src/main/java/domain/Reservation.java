@@ -1,8 +1,10 @@
-package domain;
+package accommodation_supplier.domain;
+
+import domain.ReservationStatus;
 
 public class Reservation {
     private int id;
-    private int accommodationiD;
+    private int accommodationId;
     private ReservationStatus status;
 
     public int getId() {
@@ -13,12 +15,12 @@ public class Reservation {
         this.id = id;
     }
 
-    public int getAccommodationiD() {
-        return accommodationiD;
+    public int getAccommodationId() {
+        return accommodationId;
     }
 
-    public void setAccommodationiD(int accommodationiD) {
-        this.accommodationiD = accommodationiD;
+    public void setAccommodationId(int accommodationId) {
+        this.accommodationId = accommodationId;
     }
 
     public ReservationStatus getStatus() {

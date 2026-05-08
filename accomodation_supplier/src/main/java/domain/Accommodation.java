@@ -1,4 +1,4 @@
-package domain;
+package accommodation_supplier.domain;
 public class Accommodation {
     private int id;
     private String name;

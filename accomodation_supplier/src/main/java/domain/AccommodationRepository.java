@@ -1,5 +1,5 @@
 package accommodation_supplier.domain;
-import domain.Accommodation;
+import accommodation_supplier.domain.Accommodation;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
