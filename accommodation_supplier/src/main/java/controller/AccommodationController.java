@@ -24,6 +24,9 @@ public class AccommodationController {
     @GetMapping("/accommodations")
     Collection<Accommodation> getAccommodations() {return accommodationRepository.getAllAccommodations();}
 
+    @GetMapping("/reservations/{id}")
+    Reservation newReservation(@PathVariable int id){return reservationRepository.getReservation(id);}
+
     @PostMapping("/reservations")
     ResponseEntity<Void> newReservation(@RequestBody Reservation reservation){
         Reservation createdReservation = reservationRepository.newReservation(reservation);
@@ -32,6 +35,26 @@ public class AccommodationController {
         }
         System.out.println("Created Reservation: " + createdReservation);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PutMapping("/reservations/{id}/confirm")
+    ResponseEntity<Void> confirmReservation(@PathVariable int id){
+        Reservation updatedReservation = reservationRepository.confirmReservation(id);
+        if (updatedReservation == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        System.out.println("Updated reservation: status: " + updatedReservation.getStatus());
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PutMapping("/reservations/{id}/cancel")
+    ResponseEntity<Void> cancelReservation(@PathVariable int id){
+        Reservation updatedReservation = reservationRepository.cancelReservation(id);
+        if (updatedReservation == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        System.out.println("Updated reservation: status: " + updatedReservation.getStatus());
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
 
