@@ -6,6 +6,7 @@ public class Reservation {
     private int id;
     private int accommodationId;
     private ReservationStatus status;
+    private int quantity;
 
     public int getId() {
         return id;
@@ -29,5 +30,13 @@ public class Reservation {
 
     public void setStatus(ReservationStatus status) {
         this.status = status;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 }

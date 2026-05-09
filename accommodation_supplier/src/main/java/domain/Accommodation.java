@@ -3,8 +3,8 @@ public class Accommodation {
     private int id;
     private String name;
     private String location;
-    private double pricePerNight;
-    private int amountOfAvailableRooms;
+    private double price;
+    private int stock;
 
     public int getId() {
         return id;
@@ -31,18 +31,18 @@ public class Accommodation {
     }
 
     public double getPricePerNight() {
-        return pricePerNight;
+        return price;
     }
 
     public void setPricePerNight(double pricePerNight) {
-        this.pricePerNight = pricePerNight;
+        this.price = pricePerNight;
     }
 
-    public int getAmountOfAvailableRooms() {
-        return amountOfAvailableRooms;
+    public int getStock() {
+        return stock;
     }
 
-    public void setAmountOfAvailableRooms(int amountOfAvailableRooms) {
-        this.amountOfAvailableRooms = amountOfAvailableRooms;
+    public void setStock(int amountOfAvailableRooms) {
+        this.stock = amountOfAvailableRooms;
     }
 }

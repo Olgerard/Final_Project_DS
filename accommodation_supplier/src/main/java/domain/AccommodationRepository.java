@@ -13,26 +13,26 @@ public class AccommodationRepository {
     public void initData() {
         Accommodation a1 = new Accommodation();
         a1.setId(1);
-        a1.setName("Hotel Ibis");
+        a1.setName("Camping Sunrise");
         a1.setLocation("Brussel");
-        a1.setPricePerNight(89.99);
-        a1.setAmountOfAvailableRooms(10);
+        a1.setPricePerNight(29.99);
+        a1.setStock(50);
         accommodations.put(String.valueOf(a1.getId()), a1);
 
         Accommodation a2 = new Accommodation();
         a2.setId(2);
-        a2.setName("Hotel Marriott");
+        a2.setName("Camping Moonlight");
         a2.setLocation("Gent");
-        a2.setPricePerNight(149.99);
-        a2.setAmountOfAvailableRooms(5);
+        a2.setPricePerNight(24.99);
+        a2.setStock(30);
         accommodations.put(String.valueOf(a2.getId()), a2);
 
         Accommodation a3 = new Accommodation();
         a3.setId(3);
-        a3.setName("B&B De Zwaan");
-        a3.setLocation("Brugge");
-        a3.setPricePerNight(65.00);
-        a3.setAmountOfAvailableRooms(3);
+        a3.setName("Camping Stardust");
+        a3.setLocation("Antwerpen");
+        a3.setPricePerNight(19.99);
+        a3.setStock(20);
         accommodations.put(String.valueOf(a3.getId()), a3);
     }
 

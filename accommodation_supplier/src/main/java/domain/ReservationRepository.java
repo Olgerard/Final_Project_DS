@@ -14,6 +14,8 @@ public class ReservationRepository {
 
     public Reservation newReservation(Reservation reservation){
         Assert.notNull(reservation, "The reservation must not be null");
+        reservation.setId(reservations.size() + 1);
+        reservation.setStatus(ReservationStatus.RESERVED);
         reservations.put(String.valueOf(reservation.getId()), reservation);
         return reservation;
     }

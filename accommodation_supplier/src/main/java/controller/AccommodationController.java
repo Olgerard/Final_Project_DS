@@ -28,13 +28,13 @@ public class AccommodationController {
     Reservation newReservation(@PathVariable int id){return reservationRepository.getReservation(id);}
 
     @PostMapping("/reservations")
-    ResponseEntity<Void> newReservation(@RequestBody Reservation reservation){
+    ResponseEntity<Reservation> newReservation(@RequestBody Reservation reservation){
         Reservation createdReservation = reservationRepository.newReservation(reservation);
         if (createdReservation == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
         System.out.println("Created Reservation: " + createdReservation);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdReservation);
     }
 
     @PutMapping("/reservations/{id}/confirm")

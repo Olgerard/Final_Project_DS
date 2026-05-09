@@ -1,5 +1,4 @@
 {
-  "id" : 1,
   "accommodationId": 1,
-  "ReservationStatus": "RESERVED"
+  "quantity": 2
 }
