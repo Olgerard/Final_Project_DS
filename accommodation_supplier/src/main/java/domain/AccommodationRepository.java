@@ -6,6 +6,6 @@ import java.util.*;
 
 @Component
 public interface AccommodationRepository extends JpaRepository<Accommodation, Integer> {
-
+    List<Accommodation> findByEventId(int eventId);
 }
 

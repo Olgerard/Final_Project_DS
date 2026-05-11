@@ -17,6 +17,15 @@ public class AccommodationController {
     @GetMapping("/accommodations")
     ResponseEntity<Collection<Accommodation>> getAccommodations() {return ResponseEntity.ok(accommodationService.getAllAccommodations());}
 
+    @GetMapping("/accommodations/{eventId}")
+    ResponseEntity<Collection<Accommodation>> getAccommodationByEvent(@PathVariable int eventId){
+        Collection<Accommodation> accommodations = accommodationService.getAccommodationsByEventId(eventId);
+        if(accommodations.isEmpty()){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return ResponseEntity.ok(accommodations);
+    }
+
     @GetMapping("/reservations/{id}")
     ResponseEntity<Reservation> getReservation(@PathVariable int id){
         Reservation reservation = accommodationService.getReservation(id);

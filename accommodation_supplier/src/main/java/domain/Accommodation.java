@@ -10,6 +10,7 @@ public class Accommodation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    private int eventId;
     private String name;
     private String location;
     private double price;
@@ -39,19 +40,27 @@ public class Accommodation {
         this.location = location;
     }
 
-    public double getPricePerNight() {
-        return price;
-    }
-
-    public void setPricePerNight(double pricePerNight) {
-        this.price = pricePerNight;
-    }
-
     public int getStock() {
         return stock;
     }
 
     public void setStock(int amountOfAvailableRooms) {
         this.stock = amountOfAvailableRooms;
+    }
+
+    public int getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(int eventId) {
+        this.eventId = eventId;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
     }
 }
