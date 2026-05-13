@@ -83,14 +83,14 @@ public class AccommodationService {
 
     public Reservation confirmReservation(int id) {
         Reservation reservation = reservationRepository.findById(id).orElse(null);
-        if (reservation == null) return null;
+        if (reservation == null || reservation.getStatus() != ReservationStatus.RESERVED) return null;
         reservation.setStatus(ReservationStatus.CONFIRMED);
         return reservationRepository.save(reservation);
     }
 
     public Reservation cancelReservation(int id) {
         Reservation reservation = reservationRepository.findById(id).orElse(null);
-        if (reservation == null) return null;
+        if (reservation == null || reservation.getStatus() != ReservationStatus.RESERVED) return null;
         Accommodation accommodation = accommodationRepository.findById(reservation.getAccommodationId()).orElse(null);
         if (accommodation != null) {
             accommodation.setStock(accommodation.getStock() + reservation.getQuantity());

@@ -23,7 +23,7 @@ public class Reservation {
         this.id = id;
     }
 
-    public int getAccommodationId() {
+    public int getTransportId() {
         return transportId;
     }
 

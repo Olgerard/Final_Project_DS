@@ -19,6 +19,14 @@ public class Reservation {
         return id;
     }
 
+    public int getTicketId() {
+        return ticketId;
+    }
+
+    public void setTicketId(int ticketId) {
+        this.ticketId = ticketId;
+    }
+
     public void setId(int id) {
         this.id = id;
     }
