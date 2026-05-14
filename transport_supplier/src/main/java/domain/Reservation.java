@@ -27,8 +27,8 @@ public class Reservation {
         return transportId;
     }
 
-    public void setAccommodationId(int accommodationId) {
-        this.transportId = accommodationId;
+    public void setTransportId(int transportId) {
+        this.transportId = transportId;
     }
 
     public ReservationStatus getStatus() {
