@@ -14,7 +14,7 @@ public class Order {
 
     private int eventId;
     private String customerName;
-    private String contactEmail;
+    private String deliveryAddress;
     private String paymentInfo;
     private ReservationStatus status;
     @OneToMany(cascade = CascadeType.ALL)
@@ -60,12 +60,12 @@ public class Order {
         this.eventId = eventId;
     }
 
-    public String getContactEmail() {
-        return contactEmail;
+    public String getDeliveryAddress() {
+        return deliveryAddress;
     }
 
-    public void setContactEmail(String contactEmail) {
-        this.contactEmail = contactEmail;
+    public void setDeliveryAddress(String deliveryAddress) {
+        this.deliveryAddress = deliveryAddress;
     }
 
     public List<OrderItem> getItems() {
