@@ -13,7 +13,6 @@ public class Order {
     private int orderId;
 
     private int eventId;
-    private String customerName;
     private String deliveryAddress;
     private String paymentInfo;
     private ReservationStatus status;
@@ -26,14 +25,6 @@ public class Order {
 
     public void setOrderId(int orderId) {
         this.orderId = orderId;
-    }
-
-    public String getCustomerName() {
-        return customerName;
-    }
-
-    public void setCustomerName(String customerName) {
-        this.customerName = customerName;
     }
 
     public String getPaymentInfo() {
