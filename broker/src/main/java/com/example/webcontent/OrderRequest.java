@@ -1,18 +1,10 @@
 package com.example.webcontent;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class Order {
-    private int orderId;
+public class OrderRequest {
     private String customerName;
     private String deliveryAddress;
     private String paymentInfo;
-    private OrderStatus status;
-    private List<OrderItem> items = new ArrayList<>();
-
-    public int getOrderId() { return orderId; }
-    public void setOrderId(int orderId) { this.orderId = orderId; }
+    private int eventId;
 
     public String getCustomerName() { return customerName; }
     public void setCustomerName(String customerName) { this.customerName = customerName; }
@@ -23,9 +15,6 @@ public class Order {
     public String getPaymentInfo() { return paymentInfo; }
     public void setPaymentInfo(String paymentInfo) { this.paymentInfo = paymentInfo; }
 
-    public OrderStatus getStatus() { return status; }
-    public void setStatus(OrderStatus status) { this.status = status; }
-
-    public List<OrderItem> getItems() { return items; }
-    public void setItems(List<OrderItem> items) { this.items = items; }
+    public int getEventId() { return eventId; }
+    public void setEventId(int eventId) { this.eventId = eventId; }
 }
