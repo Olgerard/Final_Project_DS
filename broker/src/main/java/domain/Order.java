@@ -4,13 +4,20 @@ import domain.ReservationStatus;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.*;
+
+@Entity
 public class Order {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int orderId;
+
     private int eventId;
     private String customerName;
     private String contactEmail;
     private String paymentInfo;
     private ReservationStatus status;
+    @OneToMany(cascade = CascadeType.ALL)
     private List<OrderItem> items = new ArrayList<>();
 
     public int getOrderId() {
