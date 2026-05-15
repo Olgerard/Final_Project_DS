@@ -1,4 +1,4 @@
-package com.example.webcontent;
+package domain;
 
 public class Order {
     private int orderId;
