@@ -90,7 +90,8 @@ public class AccommodationService {
 
     public Reservation cancelReservation(int id) {
         Reservation reservation = reservationRepository.findById(id).orElse(null);
-        if (reservation == null || reservation.getStatus() != ReservationStatus.RESERVED) return null;
+        if (reservation == null) return null;
+        if (reservation.getStatus() == ReservationStatus.CANCELLED) return reservation;
         Accommodation accommodation = accommodationRepository.findById(reservation.getAccommodationId()).orElse(null);
         if (accommodation != null) {
             accommodation.setStock(accommodation.getStock() + reservation.getQuantity());

@@ -91,7 +91,8 @@ public class TicketService {
 
     public Reservation cancelReservation(int id) {
         Reservation reservation = reservationRepository.findById(id).orElse(null);
-        if (reservation == null || reservation.getStatus() != ReservationStatus.RESERVED) return null;
+        if (reservation == null) return null;
+        if (reservation.getStatus() == ReservationStatus.CANCELLED) return reservation;
         Ticket Ticket = ticketRepository.findById(reservation.getTicketId()).orElse(null);
         if (Ticket != null) {
             Ticket.setStock(Ticket.getStock() + reservation.getQuantity());

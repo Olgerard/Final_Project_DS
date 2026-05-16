@@ -99,7 +99,8 @@ public class TransportService {
 
     public Reservation cancelReservation(int id) {
         Reservation reservation = reservationRepository.findById(id).orElse(null);
-        if (reservation == null || reservation.getStatus() != ReservationStatus.RESERVED) return null;
+        if (reservation == null) return null;
+        if (reservation.getStatus() == ReservationStatus.CANCELLED) return reservation;
         Transport transport = transportRepository.findById(reservation.getTransportId()).orElse(null);
         if (transport != null) {
             transport.setStock(transport.getStock() + reservation.getQuantity());
