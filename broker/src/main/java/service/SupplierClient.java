@@ -1,4 +1,4 @@
-package com.example.webcontent;
+package broker.service;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;

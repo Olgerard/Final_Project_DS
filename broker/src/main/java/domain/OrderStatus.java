@@ -1,4 +1,4 @@
-package com.example.webcontent;
+package broker.domain;
 
 public enum OrderStatus {
     PENDING,

@@ -1,7 +1,12 @@
-package com.example.webcontent;
+package broker.service;
 
+import broker.domain.Order;
+import broker.domain.OrderItem;
+import broker.domain.OrderStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import broker.domain.OrderRepository;
+import broker.service.SupplierClient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,9 +24,8 @@ public class BrokerService {
     @Autowired
     private SupplierClient supplierClient;
 
-    // Simple in-memory order store (replace with a database for production)
-    private final List<Order> orders = new ArrayList<>();
-    private final AtomicInteger orderIdCounter = new AtomicInteger(1);
+    @Autowired
+    private broker.domain.OrderRepository orderRepository;
 
     public String getStatus() {
         return "Service works";
@@ -40,11 +44,11 @@ public class BrokerService {
                             String paymentInfo, int eventId) {
 
         Order order = new Order();
-        order.setOrderId(orderIdCounter.getAndIncrement());
         order.setCustomerName(customerName);
         order.setDeliveryAddress(deliveryAddress);
         order.setPaymentInfo(paymentInfo);
         order.setStatus(OrderStatus.PENDING);
+        orderRepository.save(order);
 
         // ------------------------------------------------------------------
         // Phase 1: Reserve at all 3 suppliers
@@ -68,7 +72,7 @@ public class BrokerService {
             if (transportReservationId != -1) supplierClient.cancelTransport(transportReservationId);
 
             order.setStatus(OrderStatus.CANCELLED);
-            orders.add(order);
+            orderRepository.save(order);
             return order;
         }
 
@@ -76,6 +80,7 @@ public class BrokerService {
         order.getItems().add(new OrderItem("accommodation", accReservationId));
         order.getItems().add(new OrderItem("ticket",        ticketReservationId));
         order.getItems().add(new OrderItem("transport",     transportReservationId));
+        orderRepository.save(order);
 
         // ------------------------------------------------------------------
         // Phase 2: Confirm at all 3 suppliers
@@ -97,13 +102,12 @@ public class BrokerService {
             supplierClient.cancelTransport(transportReservationId);
             order.setStatus(OrderStatus.CANCELLED);
         }
-
-        orders.add(order);
+        orderRepository.save(order);
         return order;
     }
 
     /** Returns all orders (for manager view). */
     public List<Order> getAllOrders() {
-        return orders;
+        return orderRepository.findAll();
     }
 }

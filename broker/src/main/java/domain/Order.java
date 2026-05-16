@@ -1,14 +1,22 @@
-package com.example.webcontent;
+package broker.domain;
+
+import broker.domain.OrderItem;
+import broker.domain.OrderStatus;
+import jakarta.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
 public class Order {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int orderId;
     private String customerName;
     private String deliveryAddress;
     private String paymentInfo;
     private OrderStatus status;
+    @OneToMany(cascade = CascadeType.ALL)
     private List<OrderItem> items = new ArrayList<>();
 
     public int getOrderId() { return orderId; }

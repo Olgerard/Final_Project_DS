@@ -1,4 +1,4 @@
-package com.example.webcontent;
+package broker.controller;
 
 public class OrderRequest {
     private String customerName;
