@@ -60,12 +60,16 @@ public class BrokerController {
     }
 
     /**
-     * Manager endpoint: list all orders.
-     * In production this would be protected by authentication.
+     * Manager endpoint: first sends you to login and then list all orders.
      */
-    @GetMapping("/orders")
-    @ResponseBody
-    public List<Order> getAllOrders() {
-        return brokerService.getAllOrders();
+    @GetMapping("/manager")
+    public String managerPage(Model model) {
+        model.addAttribute("orders", brokerService.getAllOrders());
+        return "manager";
+    }
+
+    @GetMapping("/login")
+    public String loginPage() {
+        return "login";
     }
 }

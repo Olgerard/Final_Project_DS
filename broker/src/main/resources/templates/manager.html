@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+    <title>Order List</title>
+</head>
+<body>
+<h1>Order List</h1>
+<table border="1">
+    <tr>
+        <th>Order ID</th>
+        <th>Customer</th>
+        <th>Contact Email</th>
+        <th>Payment Info</th>
+        <th>Status</th>
+        <th>Items</th>
+    </tr>
+    <tr th:each="order : ${orders}">
+        <td th:text="${order.orderId}"></td>
+        <td th:text="${order.customerName}"></td>
+        <td th:text="${order.deliveryAddress}"></td>
+        <td th:text="${order.paymentInfo}"></td>
+        <td th:text="${order.status}"></td>
+        <td>
+            <ul>
+                <li th:each="item : ${order.items}">
+                    <span th:text="${item.itemId}"></span> —
+                    Supplier: <span th:text="${item.supplier}"></span>
+                    reservation ID: <span th:text="${item.reservationId}"></span>
+                </li>
+            </ul>
+        </td>
+    </tr>
+</table>
+<form th:action="@{/logout}" method="post">
+    <input type="submit" value="Sign Out"/>
+</form>
+</body>
+</html>

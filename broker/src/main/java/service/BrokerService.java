@@ -3,6 +3,7 @@ package broker.service;
 import broker.domain.Order;
 import broker.domain.OrderItem;
 import broker.domain.OrderStatus;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import broker.domain.OrderRepository;
@@ -26,6 +27,19 @@ public class BrokerService {
 
     @Autowired
     private broker.domain.OrderRepository orderRepository;
+
+    @PostConstruct
+    public void initData() {
+        Order order = new Order();
+        order.setCustomerName("Alice");
+        order.setDeliveryAddress("alice@example.com");
+        order.setPaymentInfo("4111111111111111");
+        order.setStatus(OrderStatus.CONFIRMED);
+        order.getItems().add(new OrderItem("accommodation", 1));
+        order.getItems().add(new OrderItem("ticket", 1));
+        order.getItems().add(new OrderItem("transport", 1));
+        orderRepository.save(order);
+    }
 
     public String getStatus() {
         return "Service works";

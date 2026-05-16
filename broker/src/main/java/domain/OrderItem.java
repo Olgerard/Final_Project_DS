@@ -23,6 +23,14 @@ public class OrderItem {
     public String getSupplier() { return supplier; }
     public void setSupplier(String supplier) { this.supplier = supplier; }
 
+    public int getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(int itemId) {
+        this.itemId = itemId;
+    }
+
     public int getReservationId() { return reservationId; }
     public void setReservationId(int reservationId) { this.reservationId = reservationId; }
 }
