@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Select Options</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; }
+        h1, h2 { color: #333; }
+        .section { margin: 20px 0; border: 1px solid #ddd; border-radius: 8px; padding: 16px; }
+        .option { margin: 8px 0; }
+        label { cursor: pointer; }
+        .field { margin: 10px 0; }
+        input[type=text], input[type=number] { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        .btn { padding: 12px 28px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        .btn:hover { background: #45a049; }
+        a { color: #555; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <a th:href="@{/}">← Back to events</a>
+    <h1>Select Your Package</h1>
+
+    <form th:action="@{/cart}" method="post">
+        <input type="hidden" name="eventId" th:value="${eventId}"/>
+
+        <div class="section">
+            <h2>Ticket</h2>
+            <div class="option" th:each="t : ${tickets}">
+                <input type="radio" th:id="'t'+${t['id']}" name="ticketId" th:value="${t['id']}" required/>
+                <label th:for="'t'+${t['id']}">
+                    <span th:text="${t['eventName']}">Name</span>
+                    — €<span th:text="${t['price']}">0</span>
+                    (stock: <span th:text="${t['stock']}">0</span>)
+                </label>
+            </div>
+            <p th:if="${#lists.isEmpty(tickets)}" style="color:red">No tickets available.</p>
+        </div>
+
+        <div class="section">
+            <h2>Accommodation</h2>
+            <div class="option" th:each="a : ${accommodations}">
+                <input type="radio" th:id="'a'+${a['id']}" name="accommodationId" th:value="${a['id']}" required/>
+                <label th:for="'a'+${a['id']}">
+                    <span th:text="${a['name']}">Name</span>
+                    — €<span th:text="${a['price']}">0</span>/night
+                    (stock: <span th:text="${a['stock']}">0</span>)
+                </label>
+            </div>
+            <p th:if="${#lists.isEmpty(accommodations)}" style="color:red">No accommodation available.</p>
+        </div>
+
+        <div class="section">
+            <h2>Transport</h2>
+            <div class="option" th:each="tr : ${transports}">
+                <input type="radio" th:id="'tr'+${tr['id']}" name="transportId" th:value="${tr['id']}" required/>
+                <label th:for="'tr'+${tr['id']}">
+                    <span th:text="${tr['type']}">Type</span>
+                    from <span th:text="${tr['departure']}">A</span>
+                    — €<span th:text="${tr['price']}">0</span>
+                    (stock: <span th:text="${tr['stock']}">0</span>)
+                </label>
+            </div>
+            <p th:if="${#lists.isEmpty(transports)}" style="color:red">No transport available.</p>
+        </div>
+
+        <div class="section">
+            <h2>Your Details</h2>
+            <div class="field">
+                <label>Name</label>
+                <input type="text" name="customerName" placeholder="Your full name" required/>
+            </div>
+            <div class="field">
+                <label>Quantity</label>
+                <input type="number" name="quantity" value="1" min="1" max="10" required/>
+            </div>
+            <div class="field">
+                <label>Payment Info</label>
+                <input type="text" name="paymentInfo" placeholder="Card number or reference" required/>
+            </div>
+        </div>
+
+        <button class="btn" type="submit">Review Order →</button>
+    </form>
+</body>
+</html>

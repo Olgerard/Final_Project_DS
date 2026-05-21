@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Booking Confirmation</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; text-align: center; }
+        .confirmed { color: #4CAF50; font-size: 28px; font-weight: bold; }
+        .cancelled { color: #e53935; font-size: 28px; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; text-align: left; }
+        td, th { padding: 10px 14px; border: 1px solid #ddd; }
+        th { background: #f5f5f5; }
+        a { display: inline-block; margin-top: 20px; padding: 12px 28px; background: #4CAF50; color: white; text-decoration: none; border-radius: 5px; }
+        a:hover { background: #45a049; }
+        .icon { font-size: 60px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <div th:if="${order.status.name() == 'CONFIRMED'}">
+        <div class="icon">✅</div>
+        <div class="confirmed">Booking Confirmed!</div>
+    </div>
+    <div th:if="${order.status.name() == 'CANCELLED'}">
+        <div class="icon">❌</div>
+        <div class="cancelled">Booking Failed</div>
+        <p>One or more suppliers could not complete the reservation. All reservations have been cancelled.</p>
+    </div>
+
+    <table>
+        <tr><th>Order ID</th><td th:text="${order.orderId}"></td></tr>
+        <tr><th>Customer</th><td th:text="${order.customerName}"></td></tr>
+        <tr><th>Status</th><td th:text="${order.status}"></td></tr>
+        <tr><th>Quantity</th><td th:text="${order.quantity}"></td></tr>
+    </table>
+
+    <a href="/">← Book Another Event</a>
+</body>
+</html>
