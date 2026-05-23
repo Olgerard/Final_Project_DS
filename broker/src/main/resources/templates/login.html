@@ -24,7 +24,7 @@
             Invalid username or password.
         </div>
 
-        <form action="/login" method="post">
+        <form th:action="@{/login}" method="post">
             <div class="field">
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username" placeholder="manager" required/>
