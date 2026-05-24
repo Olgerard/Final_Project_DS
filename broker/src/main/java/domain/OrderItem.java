@@ -1,7 +1,7 @@
-package domain;
+package broker.domain;
 
 import jakarta.persistence.*;
-import domain.OrderStatus;
+import broker.domain.OrderStatus;
 
 @Entity
 public class OrderItem {

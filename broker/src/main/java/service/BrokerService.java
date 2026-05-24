@@ -1,16 +1,19 @@
-package service;
+package broker.service;
 
-import domain.Order;
-import domain.OrderItem;
-import domain.OrderStatus;
+import broker.domain.Order;
+import broker.domain.OrderRepository;
+import broker.domain.Event;
+import broker.domain.EventRepository;
+import broker.domain.OrderStatus;
+import broker.domain.OrderItem;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import domain.OrderRepository;
-import service.SupplierClient;
+import broker.service.SupplierClient;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -26,7 +29,10 @@ public class BrokerService {
     private SupplierClient supplierClient;
 
     @Autowired
-    private domain.OrderRepository orderRepository;
+    private OrderRepository orderRepository;
+
+    @Autowired
+    private EventRepository eventRepository;
 
     //Temporary testdata
     @PostConstruct
@@ -40,6 +46,10 @@ public class BrokerService {
         order.getItems().add(new OrderItem("ticket", 1));
         order.getItems().add(new OrderItem("transport", 1));
         orderRepository.save(order);
+
+        eventRepository.save(new Event("Tomorrowland", "Boom", "18-20 Jul 2025"));
+        eventRepository.save(new Event("Gentse Feesten", "Gent", "11-20 Jul 2025"));
+        eventRepository.save(new Event("Rock Werchter", "Werchter", "3-6 Jul 2025"));
     }
 
     //Recovering Pending requests after broker crash
@@ -96,8 +106,12 @@ public class BrokerService {
         }
     }
 
-    public String getStatus() {
-        return "Service works";
+    public Optional<Order> getOrder(int orderId) {
+        return orderRepository.findById(orderId);
+    }
+
+    public List<Event> getAllEvents() {
+        return eventRepository.findAll();
     }
 
     /**
@@ -109,14 +123,17 @@ public class BrokerService {
      * @param eventId         the event id used to look up availability at suppliers
      * @return the completed Order with status CONFIRMED or CANCELLED
      */
-    public Order placeOrder(String customerName, String deliveryAddress,
-                            String paymentInfo, int eventId) {
-
+    public Order placeOrder(String customerName, String deliveryAddress, String paymentInfo, int eventId, int ticketId, int transportId, int accommodationId, int quantity) {
         Order order = new Order();
         order.setCustomerName(customerName);
         order.setDeliveryAddress(deliveryAddress);
         order.setPaymentInfo(paymentInfo);
+        order.setQuantity(quantity);
         order.setStatus(OrderStatus.PENDING);
+        order.setAccommodationId(accommodationId);
+        order.setTransportId(transportId);
+        order.setTicketId(ticketId);
+        order.setEventId(eventId);
         orderRepository.save(order);
 
         // ------------------------------------------------------------------
@@ -124,9 +141,9 @@ public class BrokerService {
         // ------------------------------------------------------------------
         System.out.println("2PC Phase 1: reserving at all suppliers for eventId=" + eventId);
 
-        int accReservationId       = supplierClient.reserveAccommodation(eventId);
-        int ticketReservationId    = supplierClient.reserveTicket(eventId);
-        int transportReservationId = supplierClient.reserveTransport(eventId);
+        int accReservationId       = supplierClient.reserveAccommodation(eventId, accommodationId, quantity);
+        int ticketReservationId    = supplierClient.reserveTicket(eventId, ticketId, quantity);
+        int transportReservationId = supplierClient.reserveTransport(eventId, transportId, quantity);
 
         boolean phase1Success =
                 accReservationId != -1 &&

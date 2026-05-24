@@ -1,39 +1,64 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
-      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Order List</title>
+    <meta charset="UTF-8"/>
+    <title>Manager Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+        h1 { color: #333; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 10px 14px; border: 1px solid #ddd; text-align: left; }
+        th { background: #f5f5f5; font-weight: bold; }
+        tr:hover { background: #fafafa; }
+        .confirmed { color: #4CAF50; font-weight: bold; }
+        .cancelled { color: #e53935; font-weight: bold; }
+        .reserved { color: #FF9800; font-weight: bold; }
+        nav { display: flex; justify-content: space-between; align-items: center; }
+        nav form { color: #555; text-decoration: none; padding: 8px 16px; border: none #ccc; border-radius: 4px; }
+        nav form:hover { background: #f5f5f5; }
+        .empty { text-align: center; color: #999; padding: 40px; }
+    </style>
 </head>
 <body>
-<h1>Order List</h1>
-<table border="1">
+<nav>
+    <h1>Manager Dashboard</h1>
+    <form th:action="@{/logout}" method="post" style="margin:0">
+        <button type="submit" style="background:none; border:1px solid #ccc; border-radius:4px; padding:8px 16px; color:#555; cursor:pointer; font-family:Arial,sans-serif; font-size:14px;">
+            Logout
+        </button>
+    </form>
+</nav>
+
+<p th:if="${#lists.isEmpty(orders)}" class="empty">No orders yet.</p>
+
+<table th:if="${!#lists.isEmpty(orders)}">
+    <thead>
     <tr>
         <th>Order ID</th>
         <th>Customer</th>
-        <th>Contact Email</th>
-        <th>Payment Info</th>
+        <th>Event ID</th>
+        <th>Ticket ID</th>
+        <th>Accommodation ID</th>
+        <th>Transport ID</th>
+        <th>Quantity</th>
         <th>Status</th>
-        <th>Items</th>
     </tr>
+    </thead>
+    <tbody>
     <tr th:each="order : ${orders}">
         <td th:text="${order.orderId}"></td>
         <td th:text="${order.customerName}"></td>
-        <td th:text="${order.deliveryAddress}"></td>
-        <td th:text="${order.paymentInfo}"></td>
-        <td th:text="${order.status}"></td>
+        <td th:text="${order.eventId}"></td>
+        <td th:text="${order.ticketId}"></td>
+        <td th:text="${order.accommodationId}"></td>
+        <td th:text="${order.transportId}"></td>
+        <td th:text="${order.quantity}"></td>
         <td>
-            <ul>
-                <li th:each="item : ${order.items}">
-                    <span th:text="${item.itemId}"></span> —
-                    Supplier: <span th:text="${item.supplier}"></span>
-                    reservation ID: <span th:text="${item.reservationId}"></span>
-                </li>
-            </ul>
+                    <span th:class="${order.status.name() == 'CONFIRMED'} ? 'confirmed' : (${order.status.name() == 'CANCELLED'} ? 'cancelled' : 'reserved')"
+                          th:text="${order.status}"></span>
         </td>
     </tr>
+    </tbody>
 </table>
-<form th:action="@{/logout}" method="post">
-    <input type="submit" value="Sign Out"/>
-</form>
 </body>
 </html>

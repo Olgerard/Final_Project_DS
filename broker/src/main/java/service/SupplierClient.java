@@ -1,4 +1,4 @@
-package service;
+package broker.service;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -30,59 +30,38 @@ public class SupplierClient {
     // Returns reservation id, or -1 on failure
     // -----------------------------------------------------------------------
 
-    public int reserveAccommodation(int eventId) {
+    public int reserveAccommodation(int eventId, int accommodationId, int quantity) {
         try {
-            ResponseEntity<List> response = restTemplate.getForEntity(
-                    ACCOMMODATION_URL + "/accommodations/" + eventId, List.class);
-            if (response.getBody() == null || response.getBody().isEmpty()) return -1;
-
-            Map<String, Object> product = (Map<String, Object>) response.getBody().get(0);
-            int productId = (Integer) product.get("id");
-
-            return doReserve(ACCOMMODATION_URL, "accommodationId", productId);
+            return doReserve(ACCOMMODATION_URL, "accommodationId", accommodationId, quantity);
         } catch (Exception e) {
             System.err.println("reserveAccommodation failed: " + e.getMessage());
             return -1;
         }
     }
 
-    public int reserveTicket(int eventId) {
+    public int reserveTicket(int eventId, int ticketId, int quantity) {
         try {
-            ResponseEntity<List> response = restTemplate.getForEntity(
-                    TICKET_URL + "/tickets/" + eventId, List.class);
-            if (response.getBody() == null || response.getBody().isEmpty()) return -1;
-
-            Map<String, Object> product = (Map<String, Object>) response.getBody().get(0);
-            int productId = (Integer) product.get("id");
-
-            return doReserve(TICKET_URL, "ticketId", productId);
+            return doReserve(TICKET_URL, "ticketId", ticketId, quantity);
         } catch (Exception e) {
             System.err.println("reserveTicket failed: " + e.getMessage());
             return -1;
         }
     }
 
-    public int reserveTransport(int eventId) {
+    public int reserveTransport(int eventId, int transportId, int quantity) {
         try {
-            ResponseEntity<List> response = restTemplate.getForEntity(
-                    TRANSPORT_URL + "/transport/" + eventId, List.class);
-            if (response.getBody() == null || response.getBody().isEmpty()) return -1;
-
-            Map<String, Object> product = (Map<String, Object>) response.getBody().get(0);
-            int productId = (Integer) product.get("id");
-
-            return doReserve(TRANSPORT_URL, "transportId", productId);
+            return doReserve(TRANSPORT_URL, "transportId", transportId, quantity);
         } catch (Exception e) {
             System.err.println("reserveTransport failed: " + e.getMessage());
             return -1;
         }
     }
 
-    private int doReserve(String baseUrl, String idField, int productId) {
+    private int doReserve(String baseUrl, String idField, int productId, int quantity) {
         try {
             Map<String, Object> body = new HashMap<>();
             body.put(idField, productId);
-            body.put("quantity", 1);
+            body.put("quantity", quantity);
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
@@ -134,6 +113,42 @@ public class SupplierClient {
             restTemplate.put(baseUrl + "/reservations/" + reservationId + "/cancel", null);
         } catch (Exception e) {
             System.err.println("Cancel failed at " + baseUrl + ": " + e.getMessage());
+        }
+    }
+
+    public List<Map> getAccommodations(int eventId) {
+        try {
+            ResponseEntity<List> response = restTemplate.getForEntity(
+                    ACCOMMODATION_URL + "/accommodations/" + eventId, List.class);
+            return response.getBody() != null ? response.getBody() : List.of();
+        }
+        catch (Exception e) {
+            System.err.println("getAccommodations failed: " + e.getMessage());
+            return List.of();
+        }
+    }
+
+    public List<Map> getTickets(int eventId) {
+        try {
+            ResponseEntity<List> response = restTemplate.getForEntity(
+                    TICKET_URL + "/tickets/" + eventId, List.class);
+            return response.getBody() != null ? response.getBody() : List.of();
+        }
+        catch (Exception e) {
+            System.err.println("getTickets failed: " + e.getMessage());
+            return List.of();
+        }
+    }
+
+    public List<Map> getTransport(int eventId) {
+        try {
+            ResponseEntity<List> response = restTemplate.getForEntity(
+                    TRANSPORT_URL + "/transport/" + eventId, List.class);
+            return response.getBody() != null ? response.getBody() : List.of();
+        }
+        catch (Exception e) {
+            System.err.println("getTransport failed: " + e.getMessage());
+            return List.of();
         }
     }
 }
