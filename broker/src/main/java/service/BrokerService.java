@@ -1,13 +1,13 @@
-package broker.service;
+package service;
 
-import broker.domain.Order;
-import broker.domain.OrderItem;
-import broker.domain.OrderStatus;
+import domain.Order;
+import domain.OrderItem;
+import domain.OrderStatus;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import broker.domain.OrderRepository;
-import broker.service.SupplierClient;
+import domain.OrderRepository;
+import service.SupplierClient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +26,7 @@ public class BrokerService {
     private SupplierClient supplierClient;
 
     @Autowired
-    private broker.domain.OrderRepository orderRepository;
+    private domain.OrderRepository orderRepository;
 
     //Temporary testdata
     @PostConstruct

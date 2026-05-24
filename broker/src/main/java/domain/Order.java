@@ -1,7 +1,7 @@
-package broker.domain;
+package domain;
 
-import broker.domain.OrderItem;
-import broker.domain.OrderStatus;
+import domain.OrderItem;
+import domain.OrderStatus;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;

@@ -1,9 +1,9 @@
-package broker.domain;
+package domain;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import broker.domain.Order;
-import broker.domain.OrderStatus;
+import domain.Order;
+import domain.OrderStatus;
 
 import java.util.List;
 

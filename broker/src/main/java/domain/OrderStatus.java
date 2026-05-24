@@ -1,4 +1,4 @@
-package broker.domain;
+package domain;
 
 public enum OrderStatus {
     PENDING,

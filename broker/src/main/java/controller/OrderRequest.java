@@ -1,4 +1,4 @@
-package broker.controller;
+package controller;
 
 public class OrderRequest {
     private String customerName;

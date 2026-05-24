@@ -1,14 +1,14 @@
-package broker.controller;
+package controller;
 
 import org.springframework.stereotype.Controller;
-import broker.service.BrokerService;
-import broker.domain.Order;
-import broker.domain.OrderStatus;
+import service.BrokerService;
+import domain.Order;
+import domain.OrderStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import broker.controller.OrderRequest;
+import controller.OrderRequest;
 
 import java.util.List;
 
