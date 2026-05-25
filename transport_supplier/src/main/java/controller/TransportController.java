@@ -14,8 +14,8 @@ public class TransportController {
     @Autowired
     private TransportService transportService;
 
-    @GetMapping("/transport")
-    ResponseEntity<Collection<Transport>> getTransport() {return ResponseEntity.ok(transportService.getAllTransports());}
+//    @GetMapping("/transport")
+//    ResponseEntity<Collection<Transport>> getTransport() {return ResponseEntity.ok(transportService.getAllTransports());}
 
     @GetMapping("/transport/{eventId}")
     ResponseEntity<Collection<Transport>> getTransportByEvent(@PathVariable int eventId){
@@ -26,14 +26,14 @@ public class TransportController {
         return ResponseEntity.ok(Transports);
     }
 
-    @GetMapping("/reservations/{id}")
-    ResponseEntity<Reservation> getReservation(@PathVariable int id){
-        Reservation reservation = transportService.getReservation(id);
-        if (reservation == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-        return ResponseEntity.ok(reservation);
-    }
+//    @GetMapping("/reservations/{id}")
+//    ResponseEntity<Reservation> getReservation(@PathVariable int id){
+//        Reservation reservation = transportService.getReservation(id);
+//        if (reservation == null) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+//        }
+//        return ResponseEntity.ok(reservation);
+//    }
 
     @PostMapping("/reservations")
     ResponseEntity<Reservation> newReservation(@RequestBody Reservation reservation){

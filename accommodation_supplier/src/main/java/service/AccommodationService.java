@@ -9,6 +9,7 @@ import accommodation_supplier.domain.ReservationRepository;
 import accommodation_supplier.domain.Accommodation;
 import accommodation_supplier.domain.Reservation;
 
+import org.springframework.transaction.annotation.Transactional;
 import java.util.Collection;
 import java.util.List;
 
@@ -79,6 +80,7 @@ public class AccommodationService {
         accommodationRepository.save(a6);
     }
 
+    @Transactional
     public Reservation newReservation(Reservation reservation) {
 
         //Test supplier failure before confirming a reservation
@@ -107,6 +109,7 @@ public class AccommodationService {
         return reservationRepository.save(reservation);
     }
 
+    @Transactional
     public Reservation cancelReservation(int id) {
         Reservation reservation = reservationRepository.findById(id).orElse(null);
         if (reservation == null) return null;

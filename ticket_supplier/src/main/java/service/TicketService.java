@@ -7,6 +7,7 @@ import ticket_supplier.domain.TicketRepository;
 import ticket_supplier.domain.ReservationRepository;
 import ticket_supplier.domain.Ticket;
 import ticket_supplier.domain.Reservation;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.Collection;
 import java.util.List;
 
@@ -81,6 +82,7 @@ public class TicketService {
         t6.setStock(75);
         ticketRepository.save(t6);
     }
+    @Transactional
     public Reservation newReservation(Reservation reservation) {
         Ticket Ticket = ticketRepository.findById(reservation.getTicketId()).orElse(null);
         if (Ticket == null || Ticket.getStock() < reservation.getQuantity()) {
@@ -99,6 +101,7 @@ public class TicketService {
         return reservationRepository.save(reservation);
     }
 
+    @Transactional
     public Reservation cancelReservation(int id) {
         Reservation reservation = reservationRepository.findById(id).orElse(null);
         if (reservation == null) return null;

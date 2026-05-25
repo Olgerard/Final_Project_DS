@@ -8,6 +8,7 @@ import transport_supplier.domain.TransportRepository;
 import transport_supplier.domain.Transport;
 import transport_supplier.domain.Reservation;
 import transport_supplier.domain.ReservationStatus;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.Collection;
@@ -88,6 +89,7 @@ public class TransportService {
         tr6.setStock(70);
         transportRepository.save(tr6);
     }
+    @Transactional
     public Reservation newReservation(Reservation reservation) {
         Transport transport = transportRepository.findById(reservation.getTransportId()).orElse(null);
         if (transport == null || transport.getStock() < reservation.getQuantity()) {
@@ -106,6 +108,7 @@ public class TransportService {
         return reservationRepository.save(reservation);
     }
 
+    @Transactional
     public Reservation cancelReservation(int id) {
         Reservation reservation = reservationRepository.findById(id).orElse(null);
         if (reservation == null) return null;

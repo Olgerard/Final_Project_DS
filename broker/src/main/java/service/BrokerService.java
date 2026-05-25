@@ -41,6 +41,7 @@ public class BrokerService {
         for (Order order : pendingOrders) {
             boolean anyConfirmed = order.getItems().stream().anyMatch(item -> item.getStatus() == OrderStatus.CONFIRMED);
             boolean anyConfirming = order.getItems().stream().anyMatch(item -> item.getStatus() == OrderStatus.CONFIRMING);
+            boolean anyCancelling = order.getItems().stream().anyMatch(item -> item.getStatus() == OrderStatus.CANCELLING);
             if (anyConfirmed || anyConfirming) {
                 // Broker crashed during confirmation and not all items are confirmed yet
                 for (OrderItem item : order.getItems()) {
@@ -68,7 +69,21 @@ public class BrokerService {
                     order.setStatus(OrderStatus.CONFIRMED);
                     orderRepository.save(order);
                 }
-            } else {
+            } else if (anyCancelling) {   // ← INSERT THIS BLOCK
+                for (OrderItem item : order.getItems()) {
+                    if (item.getStatus() == OrderStatus.CANCELLING) {
+                        if ("accommodation".equals(item.getSupplier()))
+                            supplierClient.cancelAccommodation(item.getReservationId());
+                        if ("ticket".equals(item.getSupplier()))
+                            supplierClient.cancelTicket(item.getReservationId());
+                        if ("transport".equals(item.getSupplier()))
+                            supplierClient.cancelTransport(item.getReservationId());
+                        item.setStatus(OrderStatus.CANCELLED);
+                        orderRepository.save(order);
+                    }
+                }
+                order.setStatus(OrderStatus.CANCELLED);
+            }else {
                 // Broker crashed before any item was confirmed
                 for (OrderItem item : order.getItems()) {
                     if (item.getStatus() == OrderStatus.PENDING) {
@@ -135,6 +150,8 @@ public class BrokerService {
         if (!phase1Success) {
             // At least one supplier failed → rollback everything
             System.out.println("2PC Phase 1 FAILED — rolling back reservations");
+            order.getItems().forEach(item -> item.setStatus(OrderStatus.CANCELLING));
+            orderRepository.save(order);
             if (accReservationId != -1)       supplierClient.cancelAccommodation(accReservationId);
             if (ticketReservationId != -1)    supplierClient.cancelTicket(ticketReservationId);
             if (transportReservationId != -1) supplierClient.cancelTransport(transportReservationId);

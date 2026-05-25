@@ -14,8 +14,8 @@ public class TicketController {
     @Autowired
     private TicketService ticketService;
 
-    @GetMapping("/tickets")
-    ResponseEntity<Collection<Ticket>> getTickets() {return ResponseEntity.ok(ticketService.getAllTickets());}
+//    @GetMapping("/tickets")
+//    ResponseEntity<Collection<Ticket>> getTickets() {return ResponseEntity.ok(ticketService.getAllTickets());}
 
     @GetMapping("/tickets/{eventId}")
     ResponseEntity<Collection<Ticket>> getTicketsByEvent(@PathVariable int eventId){
@@ -26,14 +26,14 @@ public class TicketController {
         return ResponseEntity.ok(tickets);
     }
 
-    @GetMapping("/reservations/{id}")
-    ResponseEntity<Reservation> getReservation(@PathVariable int id){
-        Reservation reservation = ticketService.getReservation(id);
-        if (reservation == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-        return ResponseEntity.ok(reservation);
-    }
+//    @GetMapping("/reservations/{id}")
+//    ResponseEntity<Reservation> getReservation(@PathVariable int id){
+//        Reservation reservation = ticketService.getReservation(id);
+//        if (reservation == null) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+//        }
+//        return ResponseEntity.ok(reservation);
+//    }
 
     @PostMapping("/reservations")
     ResponseEntity<Reservation> newReservation(@RequestBody Reservation reservation){
