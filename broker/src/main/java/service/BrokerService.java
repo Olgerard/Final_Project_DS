@@ -34,24 +34,6 @@ public class BrokerService {
     @Autowired
     private EventRepository eventRepository;
 
-    //Temporary testdata
-    @PostConstruct
-    public void initData() {
-        Order order = new Order();
-        order.setCustomerName("Alice");
-        order.setDeliveryAddress("alice@example.com");
-        order.setPaymentInfo("4111111111111111");
-        order.setStatus(OrderStatus.CONFIRMED);
-        order.getItems().add(new OrderItem("accommodation", 1));
-        order.getItems().add(new OrderItem("ticket", 1));
-        order.getItems().add(new OrderItem("transport", 1));
-        orderRepository.save(order);
-
-        eventRepository.save(new Event("Tomorrowland", "Boom", "18-20 Jul 2025"));
-        eventRepository.save(new Event("Gentse Feesten", "Gent", "11-20 Jul 2025"));
-        eventRepository.save(new Event("Rock Werchter", "Werchter", "3-6 Jul 2025"));
-    }
-
     //Recovering Pending requests after broker crash
     @PostConstruct
     public void recoverPendingOrders() {

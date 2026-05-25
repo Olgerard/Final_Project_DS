@@ -83,7 +83,12 @@
         </div>
     </div>
 
-    <button class="btn" type="submit">Review Order →</button>
+    <button class="btn" type="submit" th:disabled="${#lists.isEmpty(tickets) or #lists.isEmpty(accommodations) or #lists.isEmpty(transports)}">
+        Review Order →
+    </button>
+    <p th:if="${#lists.isEmpty(tickets) or #lists.isEmpty(accommodations) or #lists.isEmpty(transports)}" style="color:red">
+        You cannot place an order: missing tickets, accommodations or transport due to supplier issues.
+    </p>
 </form>
 </body>
 </html>

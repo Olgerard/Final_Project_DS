@@ -11,6 +11,7 @@ import transport_supplier.domain.ReservationStatus;
 
 
 import java.util.Collection;
+import java.util.List;
 
 @Service
 public class TransportService {
@@ -19,6 +20,14 @@ public class TransportService {
 
     @Autowired
     private TransportRepository transportRepository;
+
+    @PostConstruct
+    public void recoverReservations() {
+        List<Reservation> reservations = reservationRepository.findByStatus(ReservationStatus.RESERVED);
+        for (Reservation reservation : reservations) {
+            cancelReservation(reservation.getId());
+        }
+    }
 
     @PostConstruct
     public void initData() {

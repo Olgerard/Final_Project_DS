@@ -8,6 +8,8 @@ import ticket_supplier.domain.ReservationRepository;
 import ticket_supplier.domain.Ticket;
 import ticket_supplier.domain.Reservation;
 import java.util.Collection;
+import java.util.List;
+
 import ticket_supplier.domain.ReservationStatus;
 
 @Service
@@ -17,6 +19,14 @@ public class TicketService {
 
     @Autowired
     private ReservationRepository reservationRepository;
+
+    @PostConstruct
+    public void recoverReservations() {
+        List<Reservation> reservations = reservationRepository.findByStatus(ReservationStatus.RESERVED);
+        for (Reservation reservation : reservations) {
+            cancelReservation(reservation.getId());
+        }
+    }
 
     @PostConstruct
     public void initData() {
