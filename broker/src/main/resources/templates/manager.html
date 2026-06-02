@@ -81,13 +81,11 @@
         </div>
         <div class="stat-card">
             <div class="stat-label">Confirmed</div>
-            <div class="stat-value confirmed"
-                 th:text="${#lists.isEmpty(orders)} ? 0 : ${orders.stream().filter(o -> o.status.name() == 'CONFIRMED').count()}">0</div>
+            <div class="stat-value confirmed" th:text="${confirmedCount}">0</div>
         </div>
         <div class="stat-card">
             <div class="stat-label">Cancelled</div>
-            <div class="stat-value cancelled"
-                 th:text="${#lists.isEmpty(orders)} ? 0 : ${orders.stream().filter(o -> o.status.name() == 'CANCELLED').count()}">0</div>
+            <div class="stat-value cancelled" th:text="${cancelledCount}">0</div>
         </div>
     </div>
 
