@@ -8,9 +8,11 @@ import transport_supplier.domain.TransportRepository;
 import transport_supplier.domain.Transport;
 import transport_supplier.domain.Reservation;
 import transport_supplier.domain.ReservationStatus;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.Collection;
+import java.util.List;
 
 @Service
 public class TransportService {
@@ -19,6 +21,14 @@ public class TransportService {
 
     @Autowired
     private TransportRepository transportRepository;
+
+    @PostConstruct
+    public void recoverReservations() {
+        List<Reservation> reservations = reservationRepository.findByStatus(ReservationStatus.RESERVED);
+        for (Reservation reservation : reservations) {
+            cancelReservation(reservation.getId());
+        }
+    }
 
     @PostConstruct
     public void initData() {
@@ -79,6 +89,7 @@ public class TransportService {
         tr6.setStock(70);
         transportRepository.save(tr6);
     }
+    @Transactional
     public Reservation newReservation(Reservation reservation) {
         Transport transport = transportRepository.findById(reservation.getTransportId()).orElse(null);
         if (transport == null || transport.getStock() < reservation.getQuantity()) {
@@ -97,9 +108,11 @@ public class TransportService {
         return reservationRepository.save(reservation);
     }
 
+    @Transactional
     public Reservation cancelReservation(int id) {
         Reservation reservation = reservationRepository.findById(id).orElse(null);
-        if (reservation == null || reservation.getStatus() != ReservationStatus.RESERVED) return null;
+        if (reservation == null) return null;
+        if (reservation.getStatus() == ReservationStatus.CANCELLED) return reservation;
         Transport transport = transportRepository.findById(reservation.getTransportId()).orElse(null);
         if (transport != null) {
             transport.setStock(transport.getStock() + reservation.getQuantity());

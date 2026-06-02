@@ -14,8 +14,8 @@ public class AccommodationController {
     @Autowired
     private AccommodationService accommodationService;
 
-    @GetMapping("/accommodations")
-    ResponseEntity<Collection<Accommodation>> getAccommodations() {return ResponseEntity.ok(accommodationService.getAllAccommodations());}
+//    @GetMapping("/accommodations")
+//    ResponseEntity<Collection<Accommodation>> getAccommodations() {return ResponseEntity.ok(accommodationService.getAllAccommodations());}
 
     @GetMapping("/accommodations/{eventId}")
     ResponseEntity<Collection<Accommodation>> getAccommodationByEvent(@PathVariable int eventId){
@@ -26,14 +26,14 @@ public class AccommodationController {
         return ResponseEntity.ok(accommodations);
     }
 
-    @GetMapping("/reservations/{id}")
-    ResponseEntity<Reservation> getReservation(@PathVariable int id){
-        Reservation reservation = accommodationService.getReservation(id);
-        if (reservation == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-        return ResponseEntity.ok(reservation);
-    }
+//    @GetMapping("/reservations/{id}")
+//    ResponseEntity<Reservation> getReservation(@PathVariable int id){
+//        Reservation reservation = accommodationService.getReservation(id);
+//        if (reservation == null) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+//        }
+//        return ResponseEntity.ok(reservation);
+//    }
 
     @PostMapping("/reservations")
     ResponseEntity<Reservation> newReservation(@RequestBody Reservation reservation){

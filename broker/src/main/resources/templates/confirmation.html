@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Booking Confirmation — EventHub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: #f4f6fb; color: #1a1a2e; }
+
+        nav { background: #1a1a2e; padding: 0 40px; display: flex; align-items: center; height: 64px; }
+        .nav-logo { color: white; font-size: 22px; font-weight: 700; }
+        .nav-logo span { color: #a78bfa; }
+
+        .progress { background: white; border-bottom: 1px solid #e2e8f0; padding: 16px 40px; display: flex; align-items: center; justify-content: center; gap: 0; }
+        .step { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: #94a3b8; }
+        .step.done { color: #10b981; }
+        .step.failed { color: #ef4444; }
+        .step-num { width: 26px; height: 26px; border-radius: 50%; background: #e2e8f0; color: #94a3b8; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
+        .step.done .step-num { background: #10b981; color: white; }
+        .step.failed .step-num { background: #ef4444; color: white; }
+        .step-line { width: 60px; height: 2px; background: #10b981; margin: 0 8px; }
+
+        .container { max-width: 580px; margin: 48px auto; padding: 0 24px 60px; text-align: center; }
+
+        .result-icon { font-size: 72px; margin-bottom: 16px; }
+        .result-title { font-size: 30px; font-weight: 700; margin-bottom: 8px; }
+        .result-title.success { color: #059669; }
+        .result-title.failed { color: #dc2626; }
+        .result-sub { color: #6b7280; font-size: 16px; margin-bottom: 36px; line-height: 1.6; }
+
+        .detail-card { background: white; border-radius: 14px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.07); margin-bottom: 24px; text-align: left; }
+        .detail-card h3 { font-size: 14px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px; }
+        .row { display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid #f8fafc; }
+        .row:last-child { border-bottom: none; }
+        .row-label { font-size: 14px; color: #6b7280; }
+        .row-value { font-size: 14px; font-weight: 600; }
+        .status-confirmed { color: #059669; background: #d1fae5; padding: 2px 10px; border-radius: 20px; font-size: 13px; }
+        .status-cancelled { color: #dc2626; background: #fee2e2; padding: 2px 10px; border-radius: 20px; font-size: 13px; }
+        .status-pending { color: #d97706; background: #fef3c7; padding: 2px 10px; border-radius: 20px; font-size: 13px; }
+
+        .btn { display: inline-block; margin-top: 4px; padding: 13px 32px; background: #7c3aed; color: white; text-decoration: none; border-radius: 10px; font-size: 15px; font-weight: 600; transition: background 0.2s; }
+        .btn:hover { background: #6d28d9; }
+        .btn-outline { display: inline-block; margin-top: 4px; margin-left: 12px; padding: 13px 32px; background: white; color: #374151; border: 1px solid #d1d5db; text-decoration: none; border-radius: 10px; font-size: 15px; font-weight: 600; transition: background 0.2s; }
+        .btn-outline:hover { background: #f9fafb; }
+        .result-title.processing { color: #d97706; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="nav-logo">Event<span>Hub</span></div>
+</nav>
+
+<div class="progress">
+    <div class="step done">
+        <div class="step-num">✓</div>
+        <span>Select Package</span>
+    </div>
+    <div class="step-line"></div>
+    <div class="step done">
+        <div class="step-num">✓</div>
+        <span>Review Order</span>
+    </div>
+    <div class="step-line"></div>
+    <div class="step" th:classappend="${order.status.name() == 'CONFIRMED'} ? 'done' : 'failed'">
+        <div class="step-num" th:text="${order.status.name() == 'CONFIRMED'} ? '✓' : '✕'">3</div>
+        <span>Confirmation</span>
+    </div>
+</div>
+
+<div class="container">
+
+    <!-- Confirmed -->
+    <div th:if="${order.status.name() == 'CONFIRMED'}">
+        <div class="result-icon">🎉</div>
+        <div class="result-title success">Booking Confirmed!</div>
+        <div class="result-sub">Your package has been successfully booked. A summary is shown below.</div>
+    </div>
+
+    <!-- Cancelled -->
+    <div th:if="${order.status.name() == 'CANCELLED'}">
+        <div class="result-icon">❌</div>
+        <div class="result-title failed">Booking Failed</div>
+        <div class="result-sub">One or more services could not complete the reservation. All reservations have been automatically cancelled.</div>
+    </div>
+
+    <!-- Pending / Confirming (broker crash recovery) -->
+    <div th:if="${order.status.name() == 'CONFIRMING' or order.status.name() == 'PENDING'}">
+        <div class="result-icon">⏳</div>
+        <div class="result-title processing">Processing...</div>
+        <div class="result-sub">The broker encountered an issue. Your order will be automatically resolved when the service recovers.</div>
+    </div>
+
+    <div class="detail-card">
+        <h3>Order Details</h3>
+        <div class="row">
+            <div class="row-label">Order ID</div>
+            <div class="row-value" th:text="${order.orderId}"></div>
+        </div>
+        <div class="row">
+            <div class="row-label">Customer</div>
+            <div class="row-value" th:text="${order.customerName}"></div>
+        </div>
+        <div class="row">
+            <div class="row-label">Quantity</div>
+            <div class="row-value" th:text="${order.quantity}"></div>
+        </div>
+        <div class="row">
+            <div class="row-label">Status</div>
+            <div class="row-value">
+                <span th:if="${order.status.name() == 'CONFIRMED'}" class="status-confirmed">Confirmed</span>
+                <span th:if="${order.status.name() == 'CANCELLED'}" class="status-cancelled">Cancelled</span>
+                <span th:if="${order.status.name() != 'CONFIRMED' and order.status.name() != 'CANCELLED'}" class="status-pending" th:text="${order.status}"></span>
+            </div>
+        </div>
+    </div>
+
+    <a class="btn" href="/">← Book Another Event</a>
+</div>
+
+</body>
+</html>

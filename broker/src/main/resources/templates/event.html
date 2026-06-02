@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Select Your Package — EventHub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: #f4f6fb; color: #1a1a2e; }
+
+        nav { background: #1a1a2e; padding: 0 40px; display: flex; align-items: center; justify-content: space-between; height: 64px; }
+        .nav-logo { color: white; font-size: 22px; font-weight: 700; }
+        .nav-logo span { color: #a78bfa; }
+        .nav-back { color: #cbd5e1; text-decoration: none; font-size: 14px; font-weight: 500; }
+        .nav-back:hover { color: white; }
+
+        /* Progress bar */
+        .progress { background: white; border-bottom: 1px solid #e2e8f0; padding: 16px 40px; display: flex; align-items: center; justify-content: center; gap: 0; }
+        .step { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: #94a3b8; }
+        .step.active { color: #7c3aed; }
+        .step.done { color: #10b981; }
+        .step-num { width: 26px; height: 26px; border-radius: 50%; background: #e2e8f0; color: #94a3b8; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
+        .step.active .step-num { background: #7c3aed; color: white; }
+        .step.done .step-num { background: #10b981; color: white; }
+        .step-line { width: 60px; height: 2px; background: #e2e8f0; margin: 0 8px; }
+
+        .container { max-width: 820px; margin: 36px auto; padding: 0 24px 60px; }
+
+        .page-title { font-size: 26px; font-weight: 700; margin-bottom: 6px; }
+        .page-sub { color: #64748b; font-size: 15px; margin-bottom: 32px; }
+
+        .section { background: white; border-radius: 14px; padding: 24px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.07); }
+        .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid #f1f5f9; }
+        .section-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .icon-ticket { background: #ede9fe; }
+        .icon-hotel  { background: #dbeafe; }
+        .icon-transport { background: #d1fae5; }
+        .icon-details { background: #fef3c7; }
+        .section-header h2 { font-size: 17px; font-weight: 700; }
+
+        .options { display: flex; flex-direction: column; gap: 10px; }
+        .option-card { border: 2px solid #e2e8f0; border-radius: 10px; padding: 14px 16px; cursor: pointer; transition: border-color 0.2s, background 0.2s; display: flex; align-items: center; gap: 12px; }
+        .option-card:hover { border-color: #a78bfa; background: #faf5ff; }
+        .option-card input[type=radio] { accent-color: #7c3aed; width: 16px; height: 16px; flex-shrink: 0; }
+        .option-card input[type=radio]:checked + .option-info { color: #7c3aed; }
+        .option-info { flex: 1; }
+        .option-name { font-size: 15px; font-weight: 600; }
+        .option-detail { font-size: 13px; color: #64748b; margin-top: 2px; }
+        .option-price { font-size: 16px; font-weight: 700; color: #7c3aed; }
+        .stock-badge { font-size: 11px; background: #f0fdf4; color: #166534; padding: 2px 8px; border-radius: 20px; font-weight: 500; }
+        .stock-low { background: #fef9c3; color: #854d0e; }
+
+        .unavailable { color: #ef4444; font-size: 14px; font-weight: 500; padding: 12px; background: #fef2f2; border-radius: 8px; }
+
+        .field { margin-bottom: 16px; }
+        .field label { display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px; }
+        .field input { width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; font-family: inherit; transition: border-color 0.2s; }
+        .field input:focus { outline: none; border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124,58,237,0.1); }
+        .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+        .submit-area { margin-top: 28px; }
+        .btn-submit { width: 100%; padding: 14px; background: #7c3aed; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.2s; }
+        .btn-submit:hover { background: #6d28d9; }
+        .btn-submit:disabled { background: #9ca3af; cursor: not-allowed; }
+        .error-msg { margin-top: 12px; color: #ef4444; font-size: 14px; background: #fef2f2; padding: 10px 14px; border-radius: 8px; }
+        .option-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="nav-logo">Event<span>Hub</span></div>
+    <a class="nav-back" th:href="@{/}">← Back to events</a>
+</nav>
+
+<div class="progress">
+    <div class="step active">
+        <div class="step-num">1</div>
+        <span>Select Package</span>
+    </div>
+    <div class="step-line"></div>
+    <div class="step">
+        <div class="step-num">2</div>
+        <span>Review Order</span>
+    </div>
+    <div class="step-line"></div>
+    <div class="step">
+        <div class="step-num">3</div>
+        <span>Confirmation</span>
+    </div>
+</div>
+
+<div class="container">
+    <div class="page-title">Build Your Package</div>
+    <div class="page-sub">Select one option from each category to complete your booking.</div>
+
+    <form th:action="@{/cart}" method="post">
+        <input type="hidden" name="eventId" th:value="${eventId}"/>
+
+        <!-- Tickets -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon icon-ticket">🎫</div>
+                <h2>Ticket</h2>
+            </div>
+            <div class="options">
+                <label class="option-card" th:each="t : ${tickets}" th:for="'t'+${t['id']}">
+                    <input type="radio" th:id="'t'+${t['id']}" name="ticketId" th:value="${t['id']}" required/>
+                    <div class="option-info">
+                        <div class="option-name" th:text="${t['eventName']}">Ticket Name</div>
+                        <div class="option-detail">General Admission</div>
+                    </div>
+                    <div class="option-right">
+                        <div class="option-price">€<span th:text="${t['price']}">0</span></div>
+                        <div class="stock-badge" th:classappend="${t['stock']} < 5 ? ' stock-low' : ''">
+                            <span th:text="${t['stock']}">0</span> left
+                        </div>
+                    </div>
+                </label>
+            </div>
+            <div class="unavailable" th:if="${#lists.isEmpty(tickets)}">⚠ No tickets available for this event.</div>
+        </div>
+
+        <!-- Accommodation -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon icon-hotel">🏨</div>
+                <h2>Accommodation</h2>
+            </div>
+            <div class="options">
+                <label class="option-card" th:each="a : ${accommodations}" th:for="'a'+${a['id']}">
+                    <input type="radio" th:id="'a'+${a['id']}" name="accommodationId" th:value="${a['id']}" required/>
+                    <div class="option-info">
+                        <div class="option-name" th:text="${a['name']}">Hotel Name</div>
+                        <div class="option-detail">Per night · Breakfast included</div>
+                    </div>
+                    <div class="option-right">
+                        <div class="option-price">€<span th:text="${a['price']}">0</span>/night</div>
+                        <div class="stock-badge" th:classappend="${a['stock']} < 5 ? ' stock-low' : ''">
+                            <span th:text="${a['stock']}">0</span> rooms left
+                        </div>
+                    </div>
+                </label>
+            </div>
+            <div class="unavailable" th:if="${#lists.isEmpty(accommodations)}">⚠ No accommodation available for this event.</div>
+        </div>
+
+        <!-- Transport -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon icon-transport">🚌</div>
+                <h2>Transport</h2>
+            </div>
+            <div class="options">
+                <label class="option-card" th:each="tr : ${transports}" th:for="'tr'+${tr['id']}">
+                    <input type="radio" th:id="'tr'+${tr['id']}" name="transportId" th:value="${tr['id']}" required/>
+                    <div class="option-info">
+                        <div class="option-name" th:text="${tr['type']}">Transport Type</div>
+                        <div class="option-detail">From: <span th:text="${tr['departure']}">Departure</span></div>
+                    </div>
+                    <div class="option-right">
+                        <div class="option-price">€<span th:text="${tr['price']}">0</span></div>
+                        <div class="stock-badge" th:classappend="${tr['stock']} < 5 ? ' stock-low' : ''">
+                            <span th:text="${tr['stock']}">0</span> seats left
+                        </div>
+                    </div>
+                </label>
+            </div>
+            <div class="unavailable" th:if="${#lists.isEmpty(transports)}">⚠ No transport available for this event.</div>
+        </div>
+
+        <!-- Your Details -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon icon-details">👤</div>
+                <h2>Your Details</h2>
+            </div>
+            <div class="field-row">
+                <div class="field">
+                    <label>Full Name</label>
+                    <input type="text" name="customerName" placeholder="e.g. Jane Doe" required/>
+                </div>
+                <div class="field">
+                    <label>Quantity</label>
+                    <input type="number" name="quantity" value="1" min="1" max="10" placeholder="1" title="Number of tickets" required/>
+                </div>
+            </div>
+            <div class="field">
+                <label>Delivery Address</label>
+                <input type="text" name="deliveryAddress" placeholder="Street, City, Country" required/>
+            </div>
+            <div class="field">
+                <label>Payment Info</label>
+                <input type="text" name="paymentInfo" placeholder="Card number or reference (simulated)" required/>
+            </div>
+        </div>
+
+        <div class="submit-area">
+            <button class="btn-submit" type="submit"
+                    th:disabled="${#lists.isEmpty(tickets) or #lists.isEmpty(accommodations) or #lists.isEmpty(transports)}">
+                Review Order →
+            </button>
+            <div class="error-msg" th:if="${#lists.isEmpty(tickets) or #lists.isEmpty(accommodations) or #lists.isEmpty(transports)}">
+                Booking unavailable: one or more supplier services are not responding.
+            </div>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>
