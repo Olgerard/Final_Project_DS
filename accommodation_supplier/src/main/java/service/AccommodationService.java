@@ -28,6 +28,28 @@ public class AccommodationService {
             cancelReservation(reservation.getId());
         }
     }
+    @PostConstruct
+    public void init() {
+        if (accommodationRepository.count() == 0) {
+            accommodationRepository.saveAll(List.of(
+                    make(1, "Camping Dreamville",        "Boom",     45.00, 200),
+                    make(1, "Camping Sunrise",           "Boom",     29.99, 150),
+                    make(2, "Camping Kouter",            "Gent",     25.00, 100),
+                    make(2, "Camping Gravensteen",       "Gent",     19.99,  80),
+                    make(3, "Camping Werchter Boutique", "Werchter", 35.00, 120),
+                    make(3, "Camping Festivalpark",      "Werchter", 22.99,  90)
+            ));
+        }
+        reservationRepository.findByStatus(ReservationStatus.RESERVED)
+                .forEach(r -> cancelReservation(r.getId()));
+    }
+
+    private Accommodation make(int eventId, String name, String location, double price, int stock) {
+        Accommodation a = new Accommodation();
+        a.setEventId(eventId); a.setName(name); a.setLocation(location);
+        a.setPrice(price); a.setStock(stock);
+        return a;
+    }
 
     @Transactional
     public Reservation newReservation(Reservation reservation) {

@@ -29,6 +29,28 @@ public class TransportService {
             cancelReservation(reservation.getId());
         }
     }
+    @PostConstruct
+    public void init() {
+        if (transportRepository.count() == 0) {
+            transportRepository.saveAll(List.of(
+                    make(1, "Bus",     "Brussel",   "Boom",     15.00,  50),
+                    make(1, "Trein",   "Antwerpen", "Boom",     10.00,  80),
+                    make(2, "Bus",     "Brussel",   "Gent",     18.00,  60),
+                    make(2, "Trein",   "Antwerpen", "Gent",     12.00, 100),
+                    make(3, "Shuttle", "Leuven",    "Werchter",  8.00, 120),
+                    make(3, "Bus",     "Brussel",   "Werchter", 20.00,  70)
+            ));
+        }
+        reservationRepository.findByStatus(ReservationStatus.RESERVED)
+                .forEach(r -> cancelReservation(r.getId()));
+    }
+
+    private Transport make(int eventId, String type, String departure, String destination, double price, int stock) {
+        Transport t = new Transport();
+        t.setEventId(eventId); t.setType(type); t.setDeparture(departure);
+        t.setDestination(destination); t.setPrice(price); t.setStock(stock);
+        return t;
+    }
 
     @Transactional
     public Reservation newReservation(Reservation reservation) {

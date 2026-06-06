@@ -28,6 +28,28 @@ public class TicketService {
             cancelReservation(reservation.getId());
         }
     }
+    @PostConstruct
+    public void init() {
+        if (ticketRepository.count() == 0) {
+            ticketRepository.saveAll(List.of(
+                    make(1, "Tomorrowland",       "Boom",     120.00, 500),
+                    make(1, "Tomorrowland VIP",   "Boom",     250.00, 100),
+                    make(2, "Gentse Feesten",     "Gent",      25.00, 300),
+                    make(2, "Gentse Feesten VIP", "Gent",      75.00,  50),
+                    make(3, "Rock Werchter",      "Werchter",  95.00, 400),
+                    make(3, "Rock Werchter VIP",  "Werchter", 200.00,  75)
+            ));
+        }
+        reservationRepository.findByStatus(ReservationStatus.RESERVED)
+                .forEach(r -> cancelReservation(r.getId()));
+    }
+
+    private Ticket make(int eventId, String name, String location, double price, int stock) {
+        Ticket t = new Ticket();
+        t.setEventId(eventId); t.setEventName(name); t.setLocation(location);
+        t.setPrice(price); t.setStock(stock);
+        return t;
+    }
 
     @Transactional
     public Reservation newReservation(Reservation reservation) {

@@ -34,6 +34,17 @@ public class BrokerService {
     @Autowired
     private EventRepository eventRepository;
 
+    @PostConstruct
+    public void init() {
+        if (eventRepository.count() == 0) {
+            eventRepository.save(new Event("Tomorrowland",   "Boom",     "2025-07-18"));
+            eventRepository.save(new Event("Gentse Feesten", "Gent",     "2025-07-19"));
+            eventRepository.save(new Event("Rock Werchter",  "Werchter", "2025-07-05"));
+        }
+        recoverPendingOrders();
+    }
+
+
     //Recovering Pending requests after broker crash
     @PostConstruct
     public void recoverPendingOrders() {
@@ -69,7 +80,7 @@ public class BrokerService {
                     order.setStatus(OrderStatus.CONFIRMED);
                     orderRepository.save(order);
                 }
-            } else if (anyCancelling) {   // ← INSERT THIS BLOCK
+            } else if (anyCancelling) {
                 for (OrderItem item : order.getItems()) {
                     if (item.getStatus() == OrderStatus.CANCELLING) {
                         if ("accommodation".equals(item.getSupplier()))

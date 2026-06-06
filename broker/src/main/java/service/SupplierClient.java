@@ -21,8 +21,8 @@ public class SupplierClient {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    private static final String ACCOMMODATION_URL = "https://eventhub-accommodation.azurewebsites.net";
-    private static final String TICKET_URL        = "https://eventhub-ticket.azurewebsites.net";
+    private static final String ACCOMMODATION_URL = "http://localhost:8081";
+    private static final String TICKET_URL        = "http://localhost:8082";
     private static final String TRANSPORT_URL     = "http://localhost:8083";
 
     // -----------------------------------------------------------------------
