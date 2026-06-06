@@ -30,65 +30,6 @@ public class TransportService {
         }
     }
 
-    @PostConstruct
-    public void initData() {
-        // Event 1: Tomorrowland (Boom)
-        Transport tr1 = new Transport();
-        tr1.setEventId(1);
-        tr1.setType("Bus");
-        tr1.setDeparture("Brussel");
-        tr1.setDestination("Boom");
-        tr1.setPrice(15.00);
-        tr1.setStock(50);
-        transportRepository.save(tr1);
-
-        Transport tr2 = new Transport();
-        tr2.setEventId(1);
-        tr2.setType("Trein");
-        tr2.setDeparture("Antwerpen");
-        tr2.setDestination("Boom");
-        tr2.setPrice(10.00);
-        tr2.setStock(80);
-        transportRepository.save(tr2);
-
-        // Event 2: Gentse Feesten (Gent)
-        Transport tr3 = new Transport();
-        tr3.setEventId(2);
-        tr3.setType("Bus");
-        tr3.setDeparture("Brussel");
-        tr3.setDestination("Gent");
-        tr3.setPrice(18.00);
-        tr3.setStock(60);
-        transportRepository.save(tr3);
-
-        Transport tr4 = new Transport();
-        tr4.setEventId(2);
-        tr4.setType("Trein");
-        tr4.setDeparture("Antwerpen");
-        tr4.setDestination("Gent");
-        tr4.setPrice(12.00);
-        tr4.setStock(100);
-        transportRepository.save(tr4);
-
-        // Event 3: Rock Werchter (Werchter)
-        Transport tr5 = new Transport();
-        tr5.setEventId(3);
-        tr5.setType("Shuttle");
-        tr5.setDeparture("Leuven");
-        tr5.setDestination("Werchter");
-        tr5.setPrice(8.00);
-        tr5.setStock(120);
-        transportRepository.save(tr5);
-
-        Transport tr6 = new Transport();
-        tr6.setEventId(3);
-        tr6.setType("Bus");
-        tr6.setDeparture("Brussel");
-        tr6.setDestination("Werchter");
-        tr6.setPrice(20.00);
-        tr6.setStock(70);
-        transportRepository.save(tr6);
-    }
     @Transactional
     public Reservation newReservation(Reservation reservation) {
         Transport transport = transportRepository.findById(reservation.getTransportId()).orElse(null);

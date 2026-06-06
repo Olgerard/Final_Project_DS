@@ -29,57 +29,6 @@ public class AccommodationService {
         }
     }
 
-    @PostConstruct
-    public void initData() {
-        Accommodation a1 = new Accommodation();
-        a1.setEventId(1);
-        a1.setName("Camping Dreamville");
-        a1.setLocation("Boom");
-        a1.setPrice(45.00);
-        a1.setStock(200);
-        accommodationRepository.save(a1);
-
-        Accommodation a2 = new Accommodation();
-        a2.setEventId(1);
-        a2.setName("Camping Sunrise");
-        a2.setLocation("Boom");
-        a2.setPrice(29.99);
-        a2.setStock(150);
-        accommodationRepository.save(a2);
-
-        Accommodation a3 = new Accommodation();
-        a3.setEventId(2);
-        a3.setName("Camping Kouter");
-        a3.setLocation("Gent");
-        a3.setPrice(25.00);
-        a3.setStock(100);
-        accommodationRepository.save(a3);
-
-        Accommodation a4 = new Accommodation();
-        a4.setEventId(2);
-        a4.setName("Camping Gravensteen");
-        a4.setLocation("Gent");
-        a4.setPrice(19.99);
-        a4.setStock(80);
-        accommodationRepository.save(a4);
-
-        Accommodation a5 = new Accommodation();
-        a5.setEventId(3);
-        a5.setName("Camping Werchter Boutique");
-        a5.setLocation("Werchter");
-        a5.setPrice(35.00);
-        a5.setStock(120);
-        accommodationRepository.save(a5);
-
-        Accommodation a6 = new Accommodation();
-        a6.setEventId(3);
-        a6.setName("Camping Festivalpark");
-        a6.setLocation("Werchter");
-        a6.setPrice(22.99);
-        a6.setStock(90);
-        accommodationRepository.save(a6);
-    }
-
     @Transactional
     public Reservation newReservation(Reservation reservation) {
 

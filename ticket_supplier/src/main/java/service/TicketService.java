@@ -29,59 +29,6 @@ public class TicketService {
         }
     }
 
-    @PostConstruct
-    public void initData() {
-        // Event 1: Tomorrowland
-        Ticket t1 = new Ticket();
-        t1.setEventId(1);
-        t1.setEventName("Tomorrowland");
-        t1.setLocation("Boom");
-        t1.setPrice(120.00);
-        t1.setStock(500);
-        ticketRepository.save(t1);
-
-        Ticket t2 = new Ticket();
-        t2.setEventId(1);
-        t2.setEventName("Tomorrowland VIP");
-        t2.setLocation("Boom");
-        t2.setPrice(250.00);
-        t2.setStock(100);
-        ticketRepository.save(t2);
-
-        // Event 2: Gentse Feesten
-        Ticket t3 = new Ticket();
-        t3.setEventId(2);
-        t3.setEventName("Gentse Feesten");
-        t3.setLocation("Gent");
-        t3.setPrice(25.00);
-        t3.setStock(300);
-        ticketRepository.save(t3);
-
-        Ticket t4 = new Ticket();
-        t4.setEventId(2);
-        t4.setEventName("Gentse Feesten VIP");
-        t4.setLocation("Gent");
-        t4.setPrice(75.00);
-        t4.setStock(50);
-        ticketRepository.save(t4);
-
-        // Event 3: Rock Werchter
-        Ticket t5 = new Ticket();
-        t5.setEventId(3);
-        t5.setEventName("Rock Werchter");
-        t5.setLocation("Werchter");
-        t5.setPrice(95.00);
-        t5.setStock(400);
-        ticketRepository.save(t5);
-
-        Ticket t6 = new Ticket();
-        t6.setEventId(3);
-        t6.setEventName("Rock Werchter VIP");
-        t6.setLocation("Werchter");
-        t6.setPrice(200.00);
-        t6.setStock(75);
-        ticketRepository.save(t6);
-    }
     @Transactional
     public Reservation newReservation(Reservation reservation) {
         Ticket Ticket = ticketRepository.findById(reservation.getTicketId()).orElse(null);
