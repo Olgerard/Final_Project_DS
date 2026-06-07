@@ -120,7 +120,7 @@ public class BrokerService {
      * @param eventId         the event id used to look up availability at suppliers
      * @return the completed Order with status CONFIRMED or CANCELLED
      */
-    public Order placeOrder(String customerName, String deliveryAddress, String paymentInfo, int eventId, int ticketId, int transportId, int accommodationId, int quantity) {
+    public Order placeOrder(String customerName, String deliveryAddress, String paymentInfo, int eventId, int ticketId, int accommodationId, int transportId, int quantity) {
         Order order = new Order();
         order.setCustomerName(customerName);
         order.setDeliveryAddress(deliveryAddress);
