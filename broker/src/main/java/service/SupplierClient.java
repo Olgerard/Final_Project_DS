@@ -23,7 +23,7 @@ public class SupplierClient {
 
     private static final String ACCOMMODATION_URL = "https://eventhub-accommodation-c7ajakacc5h4ggax.polandcentral-01.azurewebsites.net";
     private static final String TICKET_URL        = "https://eventhub-ticket-hgabb0baazhwe3bm.switzerlandnorth-01.azurewebsites.net";
-    private static final String TRANSPORT_URL     = "http://localhost:8083";
+    private static final String TRANSPORT_URL     = "https://transport-supplier-c7cpace0bscvdva2-dyakemfaajceaqbg.swedencentral-01.azurewebsites.net";
 
     // -----------------------------------------------------------------------
     // Phase 1 — Reserve at each supplier

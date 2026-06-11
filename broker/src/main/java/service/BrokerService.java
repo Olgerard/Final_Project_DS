@@ -106,6 +106,9 @@ public class BrokerService {
     public Optional<Order> getOrder(int orderId) {
         return orderRepository.findById(orderId);
     }
+    public List<Order> getOrderByStatus(OrderStatus status) {
+        return orderRepository.findByStatus(status);
+    }
 
     public List<Event> getAllEvents() {
         return eventRepository.findAll();
