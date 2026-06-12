@@ -84,7 +84,10 @@ public class BrokerController {
 
     @GetMapping("/manager")
     public String manager(Model model) {
-        model.addAttribute("orders", brokerService.getAllOrders());
+        List<Order> orders = brokerService.getAllOrders();
+        model.addAttribute("orders", orders);
+        model.addAttribute("confirmedCount", orders.stream().filter(o -> o.getStatus() == OrderStatus.CONFIRMED).count());
+        model.addAttribute("cancelledCount", orders.stream().filter(o -> o.getStatus() == OrderStatus.CANCELLED).count());
         return "manager";
     }
 

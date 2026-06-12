@@ -1,49 +1,135 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8"/>
-  <title>Review Order</title>
-  <style>
-    body { font-family: Arial, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; }
-    h1 { color: #333; }
-    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-    td, th { padding: 10px 14px; border: 1px solid #ddd; text-align: left; }
-    th { background: #f5f5f5; }
-    .actions { margin-top: 20px; display: flex; gap: 14px; }
-    .btn { padding: 12px 28px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
-    .btn:hover { background: #45a049; }
-    .btn-back { padding: 12px 28px; background: #aaa; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; text-decoration: none; }
-    .btn-back:hover { background: #999; }
-  </style>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Review Order — EventHub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: #f4f6fb; color: #1a1a2e; }
+
+        nav { background: #1a1a2e; padding: 0 40px; display: flex; align-items: center; justify-content: space-between; height: 64px; }
+        .nav-logo { color: white; font-size: 22px; font-weight: 700; }
+        .nav-logo span { color: #a78bfa; }
+        .nav-back { color: #cbd5e1; text-decoration: none; font-size: 14px; font-weight: 500; }
+        .nav-back:hover { color: white; }
+
+        .progress { background: white; border-bottom: 1px solid #e2e8f0; padding: 16px 40px; display: flex; align-items: center; justify-content: center; gap: 0; }
+        .step { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: #94a3b8; }
+        .step.active { color: #7c3aed; }
+        .step.done { color: #10b981; }
+        .step-num { width: 26px; height: 26px; border-radius: 50%; background: #e2e8f0; color: #94a3b8; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
+        .step.active .step-num { background: #7c3aed; color: white; }
+        .step.done .step-num { background: #10b981; color: white; }
+        .step-line { width: 60px; height: 2px; background: #e2e8f0; margin: 0 8px; }
+        .step.done + .step-line { background: #10b981; }
+
+        .container { max-width: 680px; margin: 40px auto; padding: 0 24px 60px; }
+        .page-title { font-size: 26px; font-weight: 700; margin-bottom: 6px; }
+        .page-sub { color: #64748b; font-size: 15px; margin-bottom: 32px; }
+
+        .summary-card { background: white; border-radius: 14px; padding: 28px; box-shadow: 0 1px 3px rgba(0,0,0,0.07); margin-bottom: 20px; }
+        .summary-card h2 { font-size: 16px; font-weight: 700; margin-bottom: 18px; color: #374151; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; }
+
+        .row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f8fafc; }
+        .row:last-child { border-bottom: none; }
+        .row-label { font-size: 14px; color: #6b7280; display: flex; align-items: center; gap: 8px; }
+        .row-value { font-size: 14px; font-weight: 600; color: #111827; }
+
+        .notice { background: #fefce8; border: 1px solid #fde68a; border-radius: 10px; padding: 14px 16px; font-size: 13px; color: #92400e; margin-bottom: 20px; }
+
+        .actions { display: flex; gap: 12px; margin-top: 8px; }
+        .btn-back { flex: 1; padding: 13px; background: white; color: #374151; border: 1px solid #d1d5db; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; text-align: center; text-decoration: none; transition: background 0.2s; }
+        .btn-back:hover { background: #f9fafb; }
+        .btn-confirm { flex: 2; padding: 13px; background: #7c3aed; color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.2s; }
+        .btn-confirm:hover { background: #6d28d9; }
+    </style>
 </head>
 <body>
-<h1>Review Your Order</h1>
 
-<table>
-  <tr><th>Field</th><th>Value</th></tr>
-  <tr><td>Customer Name</td><td th:text="${customerName}"></td></tr>
-  <tr><td>Quantity</td><td th:text="${quantity}"></td></tr>
-  <tr><td>Delivery Address</td><td th:text="${deliveryAddress}"></td></tr>
-  <tr><td>Ticket ID</td><td th:text="${ticketId}"></td></tr>
-  <tr><td>Accommodation ID</td><td th:text="${accommodationId}"></td></tr>
-  <tr><td>Transport ID</td><td th:text="${transportId}"></td></tr>
-  <tr><td>Payment Info</td><td th:text="${paymentInfo}"></td></tr>
-</table>
+<nav>
+    <div class="nav-logo">Event<span>Hub</span></div>
+    <a class="nav-back" th:href="@{/}">← Home</a>
+</nav>
 
-<form th:action="@{/order}" method="post">
-  <input type="hidden" name="eventId" th:value="${eventId}"/>
-  <input type="hidden" name="ticketId" th:value="${ticketId}"/>
-  <input type="hidden" name="accommodationId" th:value="${accommodationId}"/>
-  <input type="hidden" name="transportId" th:value="${transportId}"/>
-  <input type="hidden" name="quantity" th:value="${quantity}"/>
-  <input type="hidden" name="customerName" th:value="${customerName}"/>
-  <input type="hidden" name="deliveryAddress" th:value="${deliveryAddress}"/>
-  <input type="hidden" name="paymentInfo" th:value="${paymentInfo}"/>
+<div class="progress">
+    <div class="step done">
+        <div class="step-num">✓</div>
+        <span>Select Package</span>
+    </div>
+    <div class="step-line"></div>
+    <div class="step active">
+        <div class="step-num">2</div>
+        <span>Review Order</span>
+    </div>
+    <div class="step-line"></div>
+    <div class="step">
+        <div class="step-num">3</div>
+        <span>Confirmation</span>
+    </div>
+</div>
 
-  <div class="actions">
-    <a class="btn-back" th:href="@{/event/{id}(id=${eventId})}">← Go Back</a>
-    <button class="btn" type="submit">Confirm &amp; Book</button>
-  </div>
-</form>
+<div class="container">
+    <div class="page-title">Review Your Order</div>
+    <div class="page-sub">Please check the details below before confirming.</div>
+
+    <div class="notice">
+        💳 Payment is simulated — no real charge will be made.
+    </div>
+
+    <div class="summary-card">
+        <h2>Customer Details</h2>
+        <div class="row">
+            <div class="row-label">👤 Name</div>
+            <div class="row-value" th:text="${customerName}"></div>
+        </div>
+        <div class="row">
+            <div class="row-label">📦 Quantity</div>
+            <div class="row-value" th:text="${quantity}"></div>
+        </div>
+        <div class="row">
+            <div class="row-label">📍 Delivery Address</div>
+            <div class="row-value" th:text="${deliveryAddress}"></div>
+        </div>
+        <div class="row">
+            <div class="row-label">💳 Payment</div>
+            <div class="row-value" th:text="${paymentInfo}"></div>
+        </div>
+    </div>
+
+    <div class="summary-card">
+        <h2>Package Summary</h2>
+        <div class="row">
+            <div class="row-label">🎫 Ticket ID</div>
+            <div class="row-value" th:text="${ticketId}"></div>
+        </div>
+        <div class="row">
+            <div class="row-label">🏨 Accommodation ID</div>
+            <div class="row-value" th:text="${accommodationId}"></div>
+        </div>
+        <div class="row">
+            <div class="row-label">🚌 Transport ID</div>
+            <div class="row-value" th:text="${transportId}"></div>
+        </div>
+    </div>
+
+    <form th:action="@{/order}" method="post">
+        <input type="hidden" name="eventId" th:value="${eventId}"/>
+        <input type="hidden" name="ticketId" th:value="${ticketId}"/>
+        <input type="hidden" name="accommodationId" th:value="${accommodationId}"/>
+        <input type="hidden" name="transportId" th:value="${transportId}"/>
+        <input type="hidden" name="quantity" th:value="${quantity}"/>
+        <input type="hidden" name="customerName" th:value="${customerName}"/>
+        <input type="hidden" name="deliveryAddress" th:value="${deliveryAddress}"/>
+        <input type="hidden" name="paymentInfo" th:value="${paymentInfo}"/>
+
+        <div class="actions">
+            <a class="btn-back" th:href="@{/event/{id}(id=${eventId})}">← Go Back</a>
+            <button class="btn-confirm" type="submit">Confirm &amp; Book →</button>
+        </div>
+    </form>
+</div>
+
 </body>
 </html>

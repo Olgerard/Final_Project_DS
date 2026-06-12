@@ -1,35 +1,282 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <meta charset="UTF-8"/>
-    <title>Event Organizer</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EventHub — Book Events</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <style>
-        body { font-family: Arial, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 20px; }
-        h1 { color: #333; }
-        .events { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 30px; }
-        .card { border: 1px solid #ddd; border-radius: 8px; padding: 20px; width: 250px; box-shadow: 2px 2px 6px rgba(0,0,0,0.1); }
-        .card h2 { margin-top: 0; color: #444; }
-        .card p { color: #666; margin: 4px 0; }
-        .btn { display: inline-block; margin-top: 14px; padding: 10px 20px; background: #4CAF50; color: white; text-decoration: none; border-radius: 5px; }
-        .btn:hover { background: #45a049; }
-        nav { text-align: right; margin-bottom: 20px; }
-        nav a { color: #555; text-decoration: none; margin-left: 15px; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f4f6fb;
+            color: #1a1a2e;
+        }
+
+        /* Navbar */
+        nav {
+            background: #1a1a2e;
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .nav-logo {
+            color: white;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-logo span {
+            color: #a78bfa;
+        }
+
+        .nav-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        /* Hero */
+        .hero {
+            background: linear-gradient(135deg, #1a1a2e 0%, #7c3aed 100%);
+            color: white;
+            text-align: center;
+            padding: 80px 20px 60px;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            line-height: 1.1;
+        }
+
+        .hero h1 span {
+            color: #a78bfa;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: #c4b5fd;
+            max-width: 500px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Events grid */
+        .section {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 48px 24px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .section-sub {
+            color: #64748b;
+            font-size: 15px;
+            margin-bottom: 32px;
+        }
+
+        .events {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-banner {
+            height: 180px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .card-banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.3s;
+        }
+
+        .card:hover .card-banner img {
+            transform: scale(1.05);
+        }
+
+        .card-banner-fallback {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 56px;
+        }
+
+        .card-banner-fallback.purple {
+            background: linear-gradient(135deg, #7c3aed, #a78bfa);
+        }
+
+        .card-banner-fallback.blue {
+            background: linear-gradient(135deg, #1d4ed8, #60a5fa);
+        }
+
+        .card-banner-fallback.pink {
+            background: linear-gradient(135deg, #be185d, #f472b6);
+        }
+
+        .card-banner-fallback.green {
+            background: linear-gradient(135deg, #065f46, #34d399);
+        }
+
+        .card-banner-fallback.hidden {
+            display: none;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .card-body h2 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .card-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: 16px;
+        }
+
+        .card-meta span {
+            font-size: 13px;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #ede9fe;
+            color: #7c3aed;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 20px;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            display: block;
+            text-align: center;
+            padding: 11px 20px;
+            background: #7c3aed;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: #6d28d9;
+        }
+
+        /* Footer */
+        footer {
+            background: #1a1a2e;
+            color: #94a3b8;
+            text-align: center;
+            padding: 24px;
+            font-size: 13px;
+            margin-top: 40px;
+        }
     </style>
 </head>
-<body>
-<nav>
-    <a th:href="@{/manager}">Manager</a>
-</nav>
-<h1>Event Organizer</h1>
-<p>Book your tickets, accommodation, and transport in one go.</p>
 
-<div class="events">
-    <div class="card" th:each="event : ${events}">
-        <h2 th:text="${event.name}">Event Name</h2>
-        <p th:text="${event.location}">Location</p>
-        <p th:text="${event.date}">Date</p>
-        <a class="btn" th:href="@{/event/{id}(id=${event.id})}">Book Now</a>
+<body>
+
+    <nav>
+        <div class="nav-logo">Event<span>Hub</span></div>
+        <div class="nav-links">
+            <a th:href="@{/manager}">Manager Portal</a>
+        </div>
+    </nav>
+
+    <div class="hero">
+        <h1>Your next event,<br /><span>all in one place</span></h1>
+        <p>Book tickets, accommodation, and transport in one seamless transaction.</p>
     </div>
-</div>
+
+    <div class="section">
+        <div class="section-title">Upcoming Events</div>
+        <div class="section-sub">Choose an event to get started</div>
+
+        <div class="events">
+            <div class="card" th:each="event, iterStat : ${events}">
+                <div class="card-banner">
+                    <img th:src="@{/images/event-{id}.jpg(id=${event.id})}" th:alt="${event.name}"
+                        th:title="${event.name}"
+                        onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');" />
+                    <div class="hidden card-banner-fallback"
+                        th:classappend="${iterStat.index % 4 == 0} ? 'purple' : (${iterStat.index % 4 == 1} ? 'blue' : (${iterStat.index % 4 == 2} ? 'pink' : 'green'))">
+                        <span
+                            th:text="${iterStat.index % 4 == 0} ? '🎵' : (${iterStat.index % 4 == 1} ? '🎪' : (${iterStat.index % 4 == 2} ? '🎤' : '🎭'))"></span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="badge">Live Event</div>
+                    <h2 th:text="${event.name}">Event Name</h2>
+                    <div class="card-meta">
+                        <span>📍 <span th:text="${event.location}">Location</span></span>
+                        <span>📅 <span th:text="${event.date}">Date</span></span>
+                    </div>
+                    <a class="btn" th:href="@{/event/{id}(id=${event.id})}">Book Now →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>© 2026 EventHub · Tickets, Accommodation &amp; Transport in one booking</footer>
+
 </body>
+
 </html>
