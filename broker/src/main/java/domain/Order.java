@@ -22,7 +22,7 @@ public class Order {
     private String paymentInfo;
     private int quantity;
     private OrderStatus status;
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<OrderItem> items = new ArrayList<>();
 
     public int getOrderId() { return orderId; }
