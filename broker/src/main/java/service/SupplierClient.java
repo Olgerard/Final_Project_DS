@@ -104,15 +104,17 @@ public class SupplierClient {
     // Phase 2b — Cancel (rollback)
     // -----------------------------------------------------------------------
 
-    public void cancelAccommodation(int reservationId) { doCancel(ACCOMMODATION_URL, reservationId); }
-    public void cancelTicket(int reservationId)        { doCancel(TICKET_URL, reservationId); }
-    public void cancelTransport(int reservationId)     { doCancel(TRANSPORT_URL, reservationId); }
+    public boolean cancelAccommodation(int reservationId) { return doCancel(ACCOMMODATION_URL, reservationId); }
+    public boolean cancelTicket(int reservationId)        { return doCancel(TICKET_URL, reservationId); }
+    public boolean cancelTransport(int reservationId)     { return doCancel(TRANSPORT_URL, reservationId); }
 
-    private void doCancel(String baseUrl, int reservationId) {
+    private boolean doCancel(String baseUrl, int reservationId) {
         try {
             restTemplate.put(baseUrl + "/reservations/" + reservationId + "/cancel", null);
+            return true;
         } catch (Exception e) {
             System.err.println("Cancel failed at " + baseUrl + ": " + e.getMessage());
+            return false;
         }
     }
 

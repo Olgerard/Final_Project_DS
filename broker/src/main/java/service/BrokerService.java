@@ -57,7 +57,8 @@ public class BrokerService {
                                 orderRepository.save(order);
                             };
                         if ("transport".equals(item.getSupplier()))
-                            if(supplierClient.confirmTransport(item.getReservationId())){
+                            if(supplierClient.confirmTransport(item.getReservationId()))
+                            {
                                 item.setStatus(OrderStatus.CONFIRMED);
                                 orderRepository.save(order);
                             };
@@ -68,49 +69,29 @@ public class BrokerService {
                     order.setStatus(OrderStatus.CONFIRMED);
                     orderRepository.save(order);
                 }
-            } else if (anyCancelling) {
+            } else{
                 for (OrderItem item : order.getItems()) {
-                    if (item.getStatus() == OrderStatus.CANCELLING) {
+                    if (item.getStatus() != OrderStatus.CANCELLED) {
                         if ("accommodation".equals(item.getSupplier()))
-                            supplierClient.cancelAccommodation(item.getReservationId());
+                            if(supplierClient.cancelAccommodation(item.getReservationId())){
+                                item.setStatus(OrderStatus.CANCELLED);
+                            };
                         if ("ticket".equals(item.getSupplier()))
-                            supplierClient.cancelTicket(item.getReservationId());
+                            if(supplierClient.cancelTicket(item.getReservationId())){
+                                item.setStatus(OrderStatus.CANCELLED);
+                            };
                         if ("transport".equals(item.getSupplier()))
-                            supplierClient.cancelTransport(item.getReservationId());
-                        item.setStatus(OrderStatus.CANCELLED);
+                            if(supplierClient.cancelTransport(item.getReservationId())){
+                                item.setStatus(OrderStatus.CANCELLED);
+                            };
                         orderRepository.save(order);
                     }
                 }
-                order.setStatus(OrderStatus.CANCELLED);
-            } else if (order.getItems().size() == 3 &&
-                       order.getItems().stream().allMatch(item -> item.getStatus() == OrderStatus.PENDING)) {
-                // Phase 1 fully succeeded but broker crashed before Phase 2 - complete the commit
-                System.out.println("[Recovery] Phase 1 was complete for order " + order.getOrderId() + " — completing Phase 2 (confirm)");
-                for (OrderItem item : order.getItems()) {
-                    if ("accommodation".equals(item.getSupplier()))
-                        supplierClient.confirmAccommodation(item.getReservationId());
-                    if ("ticket".equals(item.getSupplier()))
-                        supplierClient.confirmTicket(item.getReservationId());
-                    if ("transport".equals(item.getSupplier()))
-                        supplierClient.confirmTransport(item.getReservationId());
-                    item.setStatus(OrderStatus.CONFIRMED);
+                boolean allCancelled = order.getItems().stream().allMatch(item -> item.getStatus()==OrderStatus.CANCELLED);
+                if(allCancelled){
+                    order.setStatus(OrderStatus.CANCELLED);
+                    orderRepository.save(order);
                 }
-                order.setStatus(OrderStatus.CONFIRMED);
-            } else {
-                // Broker crashed during Phase 1 - cancel whatever was reserved
-                for (OrderItem item : order.getItems()) {
-                    if (item.getStatus() == OrderStatus.PENDING) {
-                        if ("accommodation".equals(item.getSupplier()))
-                            supplierClient.cancelAccommodation(item.getReservationId());
-                        if ("ticket".equals(item.getSupplier()))
-                            supplierClient.cancelTicket(item.getReservationId());
-                        if ("transport".equals(item.getSupplier()))
-                            supplierClient.cancelTransport(item.getReservationId());
-                        item.setStatus(OrderStatus.CANCELLED);
-                        orderRepository.save(order);
-                    }
-                }
-                order.setStatus(OrderStatus.CANCELLED);
             }
             orderRepository.save(order);
         }
@@ -119,7 +100,6 @@ public class BrokerService {
     public Optional<Order> getOrder(int orderId) {
         return orderRepository.findById(orderId);
     }
-
     public List<Order> getOrderByStatus(OrderStatus status) {
         return orderRepository.findByStatus(status);
     }
@@ -155,33 +135,50 @@ public class BrokerService {
         // ------------------------------------------------------------------
         System.out.println("2PC Phase 1: reserving at all suppliers for eventId=" + eventId);
 
-        int accReservationId       = supplierClient.reserveAccommodation(eventId, accommodationId, quantity);
-        int ticketReservationId    = supplierClient.reserveTicket(eventId, ticketId, quantity);
+        int accReservationId = supplierClient.reserveAccommodation(eventId, accommodationId, quantity);
+        if (accReservationId != -1) {
+            order.getItems().add(new OrderItem("accommodation", accReservationId));
+            orderRepository.save(order);
+        }
+
+        //Simulate broker crash in between reservations
+        //System.exit(0);
+
+        int ticketReservationId = supplierClient.reserveTicket(eventId, ticketId, quantity);
+        if (ticketReservationId != -1) {
+            order.getItems().add(new OrderItem("ticket", ticketReservationId));
+            orderRepository.save(order);
+        }
+
         int transportReservationId = supplierClient.reserveTransport(eventId, transportId, quantity);
+        if (transportReservationId != -1) {
+            order.getItems().add(new OrderItem("transport", transportReservationId));
+            orderRepository.save(order);
+        }
 
-        boolean phase1Success =
-                accReservationId != -1 &&
-                ticketReservationId != -1 &&
-                transportReservationId != -1;
-
+        boolean phase1Success = accReservationId != -1 && ticketReservationId != -1 && transportReservationId != -1;
         if (!phase1Success) {
             // At least one supplier failed → rollback everything
             System.out.println("2PC Phase 1 FAILED — rolling back reservations");
-            order.getItems().forEach(item -> item.setStatus(OrderStatus.CANCELLING));
-            orderRepository.save(order);
-            if (accReservationId != -1)       supplierClient.cancelAccommodation(accReservationId);
-            if (ticketReservationId != -1)    supplierClient.cancelTicket(ticketReservationId);
-            if (transportReservationId != -1) supplierClient.cancelTransport(transportReservationId);
+            for (OrderItem item : order.getItems()) {
+                item.setStatus(OrderStatus.CANCELLING);
+                orderRepository.save(order);
+
+                if ("accommodation".equals(item.getSupplier()))
+                    supplierClient.cancelAccommodation(item.getReservationId());
+                if ("ticket".equals(item.getSupplier()))
+                    supplierClient.cancelTicket(item.getReservationId());
+                if ("transport".equals(item.getSupplier()))
+                    supplierClient.cancelTransport(item.getReservationId());
+
+                item.setStatus(OrderStatus.CANCELLED);
+                orderRepository.save(order);
+            }
 
             order.setStatus(OrderStatus.CANCELLED);
             orderRepository.save(order);
             return order;
         }
-
-        // Record the reservation ids on the order
-        order.getItems().add(new OrderItem("accommodation", accReservationId));
-        order.getItems().add(new OrderItem("ticket",        ticketReservationId));
-        order.getItems().add(new OrderItem("transport",     transportReservationId));
         orderRepository.save(order);
 
         // ------------------------------------------------------------------
@@ -196,6 +193,9 @@ public class BrokerService {
             order.getItems().get(0).setStatus(OrderStatus.CONFIRMED);
             orderRepository.save(order);
         }
+
+        //Simulate broker crash during confirmation
+        //System.exit(0);
 
         order.getItems().get(1).setStatus(OrderStatus.CONFIRMING);
         orderRepository.save(order);
