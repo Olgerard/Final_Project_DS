@@ -94,8 +94,23 @@ public class BrokerService {
                     }
                 }
                 order.setStatus(OrderStatus.CANCELLED);
-            }else {
-                // Broker crashed before any item was confirmed
+            } else if (order.getItems().size() == 3 &&
+                       order.getItems().stream().allMatch(item -> item.getStatus() == OrderStatus.PENDING)) {
+                // Phase 1 fully succeeded but broker crashed before Phase 2 — complete the commit
+                System.out.println("[Recovery] Phase 1 was complete for order " + order.getOrderId() + " — completing Phase 2 (confirm)");
+                for (OrderItem item : order.getItems()) {
+                    if ("accommodation".equals(item.getSupplier()))
+                        supplierClient.confirmAccommodation(item.getReservationId());
+                    if ("ticket".equals(item.getSupplier()))
+                        supplierClient.confirmTicket(item.getReservationId());
+                    if ("transport".equals(item.getSupplier()))
+                        supplierClient.confirmTransport(item.getReservationId());
+                    item.setStatus(OrderStatus.CONFIRMED);
+                }
+                order.setStatus(OrderStatus.CONFIRMED);
+            } else {
+                // Broker crashed during Phase 1 — cancel whatever was reserved
+                System.out.println("[Recovery] Phase 1 incomplete for order " + order.getOrderId() + " — cancelling");
                 for (OrderItem item : order.getItems()) {
                     if (item.getStatus() == OrderStatus.PENDING) {
                         if ("accommodation".equals(item.getSupplier()))
@@ -105,7 +120,6 @@ public class BrokerService {
                         if ("transport".equals(item.getSupplier()))
                             supplierClient.cancelTransport(item.getReservationId());
                         item.setStatus(OrderStatus.CANCELLED);
-                        orderRepository.save(order);
                     }
                 }
                 order.setStatus(OrderStatus.CANCELLED);
@@ -131,7 +145,7 @@ public class BrokerService {
      * @param eventId         the event id used to look up availability at suppliers
      * @return the completed Order with status CONFIRMED or CANCELLED
      */
-    public Order placeOrder(String customerName, String deliveryAddress, String paymentInfo, int eventId, int ticketId, int transportId, int accommodationId, int quantity) {
+    public Order placeOrder(String customerName, String deliveryAddress, String paymentInfo, int eventId, int ticketId, int accommodationId, int transportId, int quantity) {
         Order order = new Order();
         order.setCustomerName(customerName);
         order.setDeliveryAddress(deliveryAddress);
@@ -188,6 +202,8 @@ public class BrokerService {
             orderRepository.save(order);
             return order;
         }
+
+        System.exit(1);
 
         // ------------------------------------------------------------------
         // Phase 2: Confirm at all 3 suppliers
