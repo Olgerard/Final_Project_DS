@@ -101,16 +101,16 @@
     <div class="summary-card">
         <h2>Package Summary</h2>
         <div class="row">
-            <div class="row-label">🎫 Ticket ID</div>
-            <div class="row-value" th:text="${ticketId}"></div>
+            <div class="row-label">🎫 Ticket</div>
+            <div class="row-value" th:text="${ticketName} ?: ${ticketId}"></div>
         </div>
         <div class="row">
-            <div class="row-label">🏨 Accommodation ID</div>
-            <div class="row-value" th:text="${accommodationId}"></div>
+            <div class="row-label">🏨 Accommodation</div>
+            <div class="row-value" th:text="${accommodationName} ?: ${accommodationId}"></div>
         </div>
         <div class="row">
-            <div class="row-label">🚌 Transport ID</div>
-            <div class="row-value" th:text="${transportId}"></div>
+            <div class="row-label">🚌 Transport</div>
+            <div class="row-value" th:text="${transportName} ?: ${transportId}"></div>
         </div>
     </div>
 

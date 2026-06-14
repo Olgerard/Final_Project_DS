@@ -59,6 +59,18 @@ public class BrokerController {
         model.addAttribute("customerName", customerName);
         model.addAttribute("deliveryAddress", deliveryAddress);
         model.addAttribute("paymentInfo", paymentInfo);
+
+        List<Map> tickets = supplierClient.getTickets(eventId);
+        List<Map> accommodations = supplierClient.getAccommodations(eventId);
+        List<Map> transports = supplierClient.getTransport(eventId);
+
+        tickets.stream().filter(t -> Integer.valueOf(ticketId).equals(t.get("id"))).findFirst()
+                .ifPresent(t -> model.addAttribute("ticketName", t.get("eventName")));
+        accommodations.stream().filter(a -> Integer.valueOf(accommodationId).equals(a.get("id"))).findFirst()
+                .ifPresent(a -> model.addAttribute("accommodationName", a.get("name")));
+        transports.stream().filter(tr -> Integer.valueOf(transportId).equals(tr.get("id"))).findFirst()
+                .ifPresent(tr -> model.addAttribute("transportName", tr.get("type")));
+
         return "cart";
     }
 
