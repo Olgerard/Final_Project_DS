@@ -149,9 +149,26 @@ public class BrokerService {
         // ------------------------------------------------------------------
         System.out.println("2PC Phase 1: reserving at all suppliers for eventId=" + eventId);
 
-        int accReservationId       = supplierClient.reserveAccommodation(eventId, accommodationId, quantity);
-        int ticketReservationId    = supplierClient.reserveTicket(eventId, ticketId, quantity);
+        int accReservationId = supplierClient.reserveAccommodation(eventId, accommodationId, quantity);
+        if (accReservationId != -1) {
+            order.getItems().add(new OrderItem("accommodation", accReservationId));
+            orderRepository.save(order);
+        }
+
+        // Test only accommodation has reserved when restart the broker this reserved is cancelled
+        // System.exit(1);
+
+        int ticketReservationId = supplierClient.reserveTicket(eventId, ticketId, quantity);
+        if (ticketReservationId != -1) {
+            order.getItems().add(new OrderItem("ticket", ticketReservationId));
+            orderRepository.save(order);
+        }
+
         int transportReservationId = supplierClient.reserveTransport(eventId, transportId, quantity);
+        if (transportReservationId != -1) {
+            order.getItems().add(new OrderItem("transport", transportReservationId));
+            orderRepository.save(order);
+        }
 
         boolean phase1Success =
                 accReservationId != -1 &&
@@ -159,24 +176,18 @@ public class BrokerService {
                 transportReservationId != -1;
 
         if (!phase1Success) {
-            // At least one supplier failed → rollback everything
             System.out.println("2PC Phase 1 FAILED — rolling back reservations");
-            order.getItems().forEach(item -> item.setStatus(OrderStatus.CANCELLING));
+            for (OrderItem item : order.getItems()) {
+                item.setStatus(OrderStatus.CANCELLING);
+            }
             orderRepository.save(order);
             if (accReservationId != -1)       supplierClient.cancelAccommodation(accReservationId);
             if (ticketReservationId != -1)    supplierClient.cancelTicket(ticketReservationId);
             if (transportReservationId != -1) supplierClient.cancelTransport(transportReservationId);
-
             order.setStatus(OrderStatus.CANCELLED);
             orderRepository.save(order);
             return order;
         }
-
-        // Record the reservation ids on the order
-        order.getItems().add(new OrderItem("accommodation", accReservationId));
-        order.getItems().add(new OrderItem("ticket",        ticketReservationId));
-        order.getItems().add(new OrderItem("transport",     transportReservationId));
-        orderRepository.save(order);
 
         // ------------------------------------------------------------------
         // Phase 2: Confirm at all 3 suppliers
