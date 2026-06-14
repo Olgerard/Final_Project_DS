@@ -57,8 +57,7 @@ public class BrokerService {
                                 orderRepository.save(order);
                             };
                         if ("transport".equals(item.getSupplier()))
-                            if(supplierClient.confirmTransport(item.getReservationId()))
-                            {
+                            if(supplierClient.confirmTransport(item.getReservationId())){
                                 item.setStatus(OrderStatus.CONFIRMED);
                                 orderRepository.save(order);
                             };
@@ -69,7 +68,7 @@ public class BrokerService {
                     order.setStatus(OrderStatus.CONFIRMED);
                     orderRepository.save(order);
                 }
-            } else if (anyCancelling) {   // ← INSERT THIS BLOCK
+            } else if (anyCancelling) {
                 for (OrderItem item : order.getItems()) {
                     if (item.getStatus() == OrderStatus.CANCELLING) {
                         if ("accommodation".equals(item.getSupplier()))
@@ -83,8 +82,22 @@ public class BrokerService {
                     }
                 }
                 order.setStatus(OrderStatus.CANCELLED);
-            }else {
-                // Broker crashed before any item was confirmed
+            } else if (order.getItems().size() == 3 &&
+                       order.getItems().stream().allMatch(item -> item.getStatus() == OrderStatus.PENDING)) {
+                // Phase 1 fully succeeded but broker crashed before Phase 2 - complete the commit
+                System.out.println("[Recovery] Phase 1 was complete for order " + order.getOrderId() + " — completing Phase 2 (confirm)");
+                for (OrderItem item : order.getItems()) {
+                    if ("accommodation".equals(item.getSupplier()))
+                        supplierClient.confirmAccommodation(item.getReservationId());
+                    if ("ticket".equals(item.getSupplier()))
+                        supplierClient.confirmTicket(item.getReservationId());
+                    if ("transport".equals(item.getSupplier()))
+                        supplierClient.confirmTransport(item.getReservationId());
+                    item.setStatus(OrderStatus.CONFIRMED);
+                }
+                order.setStatus(OrderStatus.CONFIRMED);
+            } else {
+                // Broker crashed during Phase 1 - cancel whatever was reserved
                 for (OrderItem item : order.getItems()) {
                     if (item.getStatus() == OrderStatus.PENDING) {
                         if ("accommodation".equals(item.getSupplier()))
@@ -106,6 +119,7 @@ public class BrokerService {
     public Optional<Order> getOrder(int orderId) {
         return orderRepository.findById(orderId);
     }
+
     public List<Order> getOrderByStatus(OrderStatus status) {
         return orderRepository.findByStatus(status);
     }
