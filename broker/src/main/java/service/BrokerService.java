@@ -72,6 +72,12 @@ public class BrokerService {
             } else{
                 for (OrderItem item : order.getItems()) {
                     if (item.getStatus() != OrderStatus.CANCELLED) {
+                        item.setStatus(OrderStatus.CANCELLING);
+                    }
+                }
+                orderRepository.save(order);
+                for (OrderItem item : order.getItems()) {
+                    if (item.getStatus() != OrderStatus.CANCELLED) {
                         if ("accommodation".equals(item.getSupplier()))
                             if(supplierClient.cancelAccommodation(item.getReservationId())){
                                 item.setStatus(OrderStatus.CANCELLED);
@@ -162,8 +168,9 @@ public class BrokerService {
             System.out.println("2PC Phase 1 FAILED — rolling back reservations");
             for (OrderItem item : order.getItems()) {
                 item.setStatus(OrderStatus.CANCELLING);
-                orderRepository.save(order);
-
+            }
+            orderRepository.save(order);
+            for (OrderItem item : new ArrayList<>(order.getItems())) {
                 if ("accommodation".equals(item.getSupplier()))
                     supplierClient.cancelAccommodation(item.getReservationId());
                 if ("ticket".equals(item.getSupplier()))
@@ -174,7 +181,6 @@ public class BrokerService {
                 item.setStatus(OrderStatus.CANCELLED);
                 orderRepository.save(order);
             }
-
             order.setStatus(OrderStatus.CANCELLED);
             orderRepository.save(order);
             return order;
@@ -219,6 +225,12 @@ public class BrokerService {
         } else {
             // Partial confirm failure — cancel what we can (best-effort rollback)
             System.out.println("2PC Phase 2 FAILED — cancelling reservations");
+            for (OrderItem item : order.getItems()) {
+                if (item.getStatus() != OrderStatus.CANCELLED) {
+                    item.setStatus(OrderStatus.CANCELLING);
+                }
+            }
+            orderRepository.save(order);
             supplierClient.cancelAccommodation(accReservationId);
             order.getItems().get(0).setStatus(OrderStatus.CANCELLED);
             supplierClient.cancelTicket(ticketReservationId);
