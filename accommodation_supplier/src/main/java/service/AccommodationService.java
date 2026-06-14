@@ -35,7 +35,7 @@ public class AccommodationService {
                     make(1, "Camping Dreamville",        "Boom",     45.00, 200),
                     make(1, "Camping Sunrise",           "Boom",     29.99, 150),
                     make(2, "Camping Kouter",            "Gent",     25.00, 100),
-                    make(2, "Camping Gravensteen",       "Gent",     19.99,  80),
+                    make(2, "Camping Gravensteen",       "Gent",     19.99,  1),
                     make(3, "Camping Werchter Boutique", "Werchter", 35.00, 120),
                     make(3, "Camping Festivalpark",      "Werchter", 22.99,  90)
             ));

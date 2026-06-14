@@ -34,17 +34,6 @@ public class BrokerService {
     @Autowired
     private EventRepository eventRepository;
 
-    @PostConstruct
-    public void init() {
-        if (eventRepository.count() == 0) {
-            eventRepository.save(new Event("Tomorrowland",   "Boom",     "2025-07-18"));
-            eventRepository.save(new Event("Gentse Feesten", "Gent",     "2025-07-19"));
-            eventRepository.save(new Event("Rock Werchter",  "Werchter", "2025-07-05"));
-        }
-        recoverPendingOrders();
-    }
-
-
     //Recovering Pending requests after broker crash
     @PostConstruct
     public void recoverPendingOrders() {
@@ -80,49 +69,35 @@ public class BrokerService {
                     order.setStatus(OrderStatus.CONFIRMED);
                     orderRepository.save(order);
                 }
-            } else if (anyCancelling) {
+            } else{
                 for (OrderItem item : order.getItems()) {
-                    if (item.getStatus() == OrderStatus.CANCELLING) {
+                    if (item.getStatus() != OrderStatus.CANCELLED) {
+                        item.setStatus(OrderStatus.CANCELLING);
+                    }
+                }
+                orderRepository.save(order);
+                for (OrderItem item : order.getItems()) {
+                    if (item.getStatus() != OrderStatus.CANCELLED) {
                         if ("accommodation".equals(item.getSupplier()))
-                            supplierClient.cancelAccommodation(item.getReservationId());
+                            if(supplierClient.cancelAccommodation(item.getReservationId())){
+                                item.setStatus(OrderStatus.CANCELLED);
+                            };
                         if ("ticket".equals(item.getSupplier()))
-                            supplierClient.cancelTicket(item.getReservationId());
+                            if(supplierClient.cancelTicket(item.getReservationId())){
+                                item.setStatus(OrderStatus.CANCELLED);
+                            };
                         if ("transport".equals(item.getSupplier()))
-                            supplierClient.cancelTransport(item.getReservationId());
-                        item.setStatus(OrderStatus.CANCELLED);
+                            if(supplierClient.cancelTransport(item.getReservationId())){
+                                item.setStatus(OrderStatus.CANCELLED);
+                            };
                         orderRepository.save(order);
                     }
                 }
-                order.setStatus(OrderStatus.CANCELLED);
-            } else if (order.getItems().size() == 3 &&
-                       order.getItems().stream().allMatch(item -> item.getStatus() == OrderStatus.PENDING)) {
-                // Phase 1 fully succeeded but broker crashed before Phase 2 — complete the commit
-                System.out.println("[Recovery] Phase 1 was complete for order " + order.getOrderId() + " — completing Phase 2 (confirm)");
-                for (OrderItem item : order.getItems()) {
-                    if ("accommodation".equals(item.getSupplier()))
-                        supplierClient.confirmAccommodation(item.getReservationId());
-                    if ("ticket".equals(item.getSupplier()))
-                        supplierClient.confirmTicket(item.getReservationId());
-                    if ("transport".equals(item.getSupplier()))
-                        supplierClient.confirmTransport(item.getReservationId());
-                    item.setStatus(OrderStatus.CONFIRMED);
+                boolean allCancelled = order.getItems().stream().allMatch(item -> item.getStatus()==OrderStatus.CANCELLED);
+                if(allCancelled){
+                    order.setStatus(OrderStatus.CANCELLED);
+                    orderRepository.save(order);
                 }
-                order.setStatus(OrderStatus.CONFIRMED);
-            } else {
-                // Broker crashed during Phase 1 — cancel whatever was reserved
-                System.out.println("[Recovery] Phase 1 incomplete for order " + order.getOrderId() + " — cancelling");
-                for (OrderItem item : order.getItems()) {
-                    if (item.getStatus() == OrderStatus.PENDING) {
-                        if ("accommodation".equals(item.getSupplier()))
-                            supplierClient.cancelAccommodation(item.getReservationId());
-                        if ("ticket".equals(item.getSupplier()))
-                            supplierClient.cancelTicket(item.getReservationId());
-                        if ("transport".equals(item.getSupplier()))
-                            supplierClient.cancelTransport(item.getReservationId());
-                        item.setStatus(OrderStatus.CANCELLED);
-                    }
-                }
-                order.setStatus(OrderStatus.CANCELLED);
             }
             orderRepository.save(order);
         }
@@ -130,6 +105,9 @@ public class BrokerService {
 
     public Optional<Order> getOrder(int orderId) {
         return orderRepository.findById(orderId);
+    }
+    public List<Order> getOrderByStatus(OrderStatus status) {
+        return orderRepository.findByStatus(status);
     }
 
     public List<Event> getAllEvents() {
@@ -169,8 +147,8 @@ public class BrokerService {
             orderRepository.save(order);
         }
 
-        // Test only accommodation has reserved when restart the broker this reserved is cancelled
-        // System.exit(1);
+        //Simulate broker crash in between reservations
+        //System.exit(0);
 
         int ticketReservationId = supplierClient.reserveTicket(eventId, ticketId, quantity);
         if (ticketReservationId != -1) {
@@ -184,26 +162,30 @@ public class BrokerService {
             orderRepository.save(order);
         }
 
-        boolean phase1Success =
-                accReservationId != -1 &&
-                ticketReservationId != -1 &&
-                transportReservationId != -1;
-
+        boolean phase1Success = accReservationId != -1 && ticketReservationId != -1 && transportReservationId != -1;
         if (!phase1Success) {
+            // At least one supplier failed → rollback everything
             System.out.println("2PC Phase 1 FAILED — rolling back reservations");
             for (OrderItem item : order.getItems()) {
                 item.setStatus(OrderStatus.CANCELLING);
             }
             orderRepository.save(order);
-            if (accReservationId != -1)       supplierClient.cancelAccommodation(accReservationId);
-            if (ticketReservationId != -1)    supplierClient.cancelTicket(ticketReservationId);
-            if (transportReservationId != -1) supplierClient.cancelTransport(transportReservationId);
+            for (OrderItem item : new ArrayList<>(order.getItems())) {
+                if ("accommodation".equals(item.getSupplier()))
+                    supplierClient.cancelAccommodation(item.getReservationId());
+                if ("ticket".equals(item.getSupplier()))
+                    supplierClient.cancelTicket(item.getReservationId());
+                if ("transport".equals(item.getSupplier()))
+                    supplierClient.cancelTransport(item.getReservationId());
+
+                item.setStatus(OrderStatus.CANCELLED);
+                orderRepository.save(order);
+            }
             order.setStatus(OrderStatus.CANCELLED);
             orderRepository.save(order);
             return order;
         }
-
-        System.exit(1);
+        orderRepository.save(order);
 
         // ------------------------------------------------------------------
         // Phase 2: Confirm at all 3 suppliers
@@ -217,6 +199,9 @@ public class BrokerService {
             order.getItems().get(0).setStatus(OrderStatus.CONFIRMED);
             orderRepository.save(order);
         }
+
+        //Simulate broker crash during confirmation
+        //System.exit(0);
 
         order.getItems().get(1).setStatus(OrderStatus.CONFIRMING);
         orderRepository.save(order);
@@ -240,6 +225,12 @@ public class BrokerService {
         } else {
             // Partial confirm failure — cancel what we can (best-effort rollback)
             System.out.println("2PC Phase 2 FAILED — cancelling reservations");
+            for (OrderItem item : order.getItems()) {
+                if (item.getStatus() != OrderStatus.CANCELLED) {
+                    item.setStatus(OrderStatus.CANCELLING);
+                }
+            }
+            orderRepository.save(order);
             supplierClient.cancelAccommodation(accReservationId);
             order.getItems().get(0).setStatus(OrderStatus.CANCELLED);
             supplierClient.cancelTicket(ticketReservationId);
